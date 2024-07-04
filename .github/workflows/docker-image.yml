@@ -40,7 +40,7 @@ jobs:
           image: ${{ secrets.DOCKER_HUB_USERNAME }}/realty-guide-api:latest
 
       - name: Deploy Worker to Railway
-        uses: railwayapp/railway-deploy@v1
+        uses: bervProject/railway-deploy@0.1.2-beta
         with:
           service-id: ${{ secrets.RAILWAY_SERVICE_ID_WORKER }}
           railway-token: ${{ secrets.RAILWAY_TOKEN }}
