@@ -33,7 +33,7 @@ jobs:
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/realty-guide-worker:latest
 
       - name: Deploy API to Railway
-        uses: railwayapp/railway-deploy@v1
+        uses: bervProject/railway-deploy@v1
         with:
           service-id: ${{ secrets.RAILWAY_SERVICE_ID_API }}
           railway-token: ${{ secrets.RAILWAY_TOKEN }}
