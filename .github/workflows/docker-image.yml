@@ -1,0 +1,47 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push API image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/realty-guide-api:latest --build-arg MODE=api .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/realty-guide-api:latest
+
+      - name: Build and push Worker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/realty-guide-worker:latest --build-arg MODE=worker .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/realty-guide-worker:latest
+
+      - name: Deploy API to Railway
+        uses: railwayapp/railway-deploy@v1
+        with:
+          service-id: ${{ secrets.RAILWAY_SERVICE_ID_API }}
+          railway-token: ${{ secrets.RAILWAY_TOKEN }}
+          image: ${{ secrets.DOCKER_HUB_USERNAME }}/realty-guide-api:latest
+
+      - name: Deploy Worker to Railway
+        uses: railwayapp/railway-deploy@v1
+        with:
+          service-id: ${{ secrets.RAILWAY_SERVICE_ID_WORKER }}
+          railway-token: ${{ secrets.RAILWAY_TOKEN }}
+          image: ${{ secrets.DOCKER_HUB_USERNAME }}/realty-guide-worker:latest

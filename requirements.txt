@@ -1,2 +1,12 @@
-fastapi==0.100.0
-hypercorn==0.14.4
+marvin==2.3.5
+fastapi
+requests==2.31.0
+sentry_sdk==2.7.1
+python-dotenv==1.0.0
+openai==1.35.7
+firecrawl-py
+celery==5.4.0
+posthog
+watchdog
+pydantic
+redis==5.0.7

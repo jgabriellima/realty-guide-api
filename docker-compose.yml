@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    environment:
+      - MODE=api
+      - APP_NAME=${APP_NAME}
+      - DEFAULT_LARGE_MODEL=${DEFAULT_LARGE_MODEL}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - SUPABASE_BUCKET_NAME=${SUPABASE_BUCKET_NAME}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - FIRECRAWL_API_KEY=${FIRECRAWL_API_KEY}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - POSTHOG_API_KEY=${POSTHOG_API_KEY}
+      - POSTHOG_HOST=${POSTHOG_HOST}
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - rabbitmq
+      - redis
+
+  worker:
+    build: .
+    environment:
+      - MODE=worker
+      - APP_NAME=${APP_NAME}
+      - DEFAULT_LARGE_MODEL=${DEFAULT_LARGE_MODEL}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - SUPABASE_BUCKET_NAME=${SUPABASE_BUCKET_NAME}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - FIRECRAWL_API_KEY=${FIRECRAWL_API_KEY}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - POSTHOG_API_KEY=${POSTHOG_API_KEY}
+      - POSTHOG_HOST=${POSTHOG_HOST}
+    volumes:
+      - .:/app
+    depends_on:
+      - rabbitmq
+      - redis
+
+  flower:
+    image: mher/flower
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - FLOWER_PORT=5555
+    ports:
+      - "5555:5555"
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  rabbitmq-data:
+  redis-data:
