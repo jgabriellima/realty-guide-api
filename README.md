@@ -60,8 +60,5 @@ Logs are stored in the logs/app.log file and sent to PostHog for analysis.
 celery --broker=amqp://8UlPsLtMcWdaewff:stbrP5Uduu8LJa7C1wv9n5Y_naaANfeu@viaduct.proxy.rlwy.net:22121 flower --port=5555
 
 
-RAILWAY_APP_TOKEN=9697b21b-83e3-4805-8deb-a25a4be8e8a7
 
-RAILWAY_APP_SERVICE_ID_API=5b362d51-b4b3-4665-912f-724a55f209c0
-RAILWAY_APP_SERVICE_ID_WORKER=06126a0c-03b0-408e-87bf-175aeb23893a
-
+%pip install --upgrade --quiet  langchain-community "docarray"

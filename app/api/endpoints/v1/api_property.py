@@ -11,6 +11,9 @@ property_router = APIRouter()
 
 @property_router.post("/lookup", response_model=PropertyLookupResponse)
 def property_lookup(request: PropertyLookupRequest):
+
+
+
     if request.url.endswith("/123"):
         return PropertyLookupResponse(property_id="123", details=mock_property_data["123"])
     else:

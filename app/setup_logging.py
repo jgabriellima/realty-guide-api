@@ -5,12 +5,12 @@ import posthog
 from app.core.settings import settings
 
 
-def setup_logging(celery=False):
+def setup_logging(name=None, celery=False):
     # Configure PostHog
     posthog.project_api_key = settings.posthog_api_key
     posthog.host = settings.posthog_host
 
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger(name or __name__)
     logger.setLevel(logging.INFO)
     handler = logging.StreamHandler()
     handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))

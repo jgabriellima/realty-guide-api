@@ -9,7 +9,7 @@ class SupabaseDB:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(SupabaseDB, cls).__new__(cls)
-            cls._instance._supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+            cls._instance._supabase = create_client(settings.supabase_url, settings.supabase_key)
         return cls._instance
 
     @property

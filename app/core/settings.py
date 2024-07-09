@@ -38,6 +38,11 @@ class Settings(BaseSettings):
     celery_broker_url: str = Field(..., validation_alias="CELERY_BROKER_URL")
     celery_result_backend: str = Field(..., validation_alias="CELERY_RESULT_BACKEND")
 
+    google_api_key: str = Field(..., validation_alias="GOOGLE_API_KEY")
+
+    browserless_url: str = Field(..., validation_alias="BROWSERLESS_URL")
+    browserless_key: str = Field(..., validation_alias="BROWSERLESS_KEY")
+
 
 settings = Settings()
 
