@@ -18,7 +18,7 @@ def property_lookup(request: PropertyLookupRequest):
     return property_service_response
 
 
-@property_router.post("/enrich", response_model=EnrichPropertyDataResponse)
+@property_router.post("/enrich_property", response_model=Union[str, Property])
 def enrich_property_data(request: EnrichPropertyDataRequest):
     if request.property_id in mock_enriched_data:
         return EnrichPropertyDataResponse(property_id=request.property_id,
@@ -26,6 +26,12 @@ def enrich_property_data(request: EnrichPropertyDataRequest):
     else:
         raise HTTPException(status_code=404, detail="Property not found")
 
+
+#
+#
+#
+#
+#
 
 @property_router.post("/get_enrichment_data", response_model=GetEnrichmentDataResponse)
 def get_enrichment_data(request: GetEnrichmentDataRequest):

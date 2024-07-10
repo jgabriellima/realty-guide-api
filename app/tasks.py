@@ -1,18 +1,32 @@
 import time
 
-from celery import Task as CeleryTask
-
-from app.core.db.supabase_conn import SupabaseDB
 from app.schemas.real_estate import Property
-from app.services.property_tasks_service import PropertyTasksService
+from app.services.property_tasks_service import PropertyLookup
 from app.services.save_property import save_property
 from app.setup_logging import setup_logging
 from app.worker import celery
 
 logger = setup_logging(celery=True)
 
+from celery import Task as CeleryTask
+from app.core.db.supabase_conn import SupabaseDB
+from app.setup_logging import setup_logging
+
+logger = setup_logging("BaseTaskWithUpdate")
+
 
 class BaseTaskWithUpdate(CeleryTask):
+    def apply_async(self, *args, **kwargs):
+        # Update task status to running
+        supabase = SupabaseDB().client
+        task_id = kwargs['task_id']
+        supabase.schema("real_estate").table("tasks").update({
+            "status": "running",
+            "updated_at": "now()"
+        }).eq("task_id", task_id).execute()
+        logger.info(f"Task {task_id} status updated to running")
+        return super().apply_async(*args, **kwargs)
+
     def on_success(self, retval, task_id, args, kwargs):
         supabase = SupabaseDB().client
         supabase.schema("real_estate").table("tasks").update({
@@ -48,14 +62,9 @@ def process_property_url(self, url: str):
     logger.info(f"Started task {task_id} for URL: {url}")
     time.sleep(5)
 
-    property: Property = PropertyTasksService().process_url(url)
+    property: Property = PropertyLookup().process_url(url)
     logger.info(f"Property data: {property}")
     save_property(property)
-    # supabase = SupabaseDB().client
-    # task_update = supabase.schema("real_estate").table("tasks").update({
-    #     "status": "completed",
-    #     "updated_at": "now()"
-    # }).eq("task_id", task_id).execute()
 
     logger.info(f"Task {task_id} completed")
 

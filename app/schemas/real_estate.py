@@ -30,6 +30,7 @@ class Property(BaseModel):
     neighborhood: Optional[str] = None
     full_address: Optional[str] = None
     property_metadata: List[PropertyMetadata] = []
+    assistant_instructions: Optional[str] = None
 
 
 # Modelo PropertyImages
@@ -101,6 +102,7 @@ class Task(BaseModel):
     input_data: Optional[Dict[str, Any]] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+    running_time: Optional[int] = None
 
 
 class TaskStatus:

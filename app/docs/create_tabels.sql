@@ -98,6 +98,7 @@ CREATE TABLE real_estate.task_catalog
     function_name VARCHAR(255) UNIQUE          NOT NULL,
     description   TEXT                         NOT NULL,
     status        VARCHAR(50) DEFAULT 'active' NOT NULL,
+    retry        bool DEFAULT true NOT NULL,
     created_at    TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 );

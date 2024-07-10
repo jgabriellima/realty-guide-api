@@ -9,7 +9,8 @@ class PropertyLookupRequest(BaseModel):
 
 
 class EnrichPropertyDataRequest(BaseModel):
-    property_id: str
+    property_slug: str
+    request_details: str
 
 
 class EnrichPropertyDataResponse(BaseModel):

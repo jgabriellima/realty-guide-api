@@ -35,7 +35,7 @@ class ImageURL(BaseModel):
     urls: List[str]
 
 
-class PropertyTasksService:
+class PropertyLookup:
     def __init__(self, debug: bool = False, http_client: Optional[requests.Session] = None):
         self.debug = debug
         self.http_client = http_client or requests.Session()
