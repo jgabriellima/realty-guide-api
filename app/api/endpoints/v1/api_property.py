@@ -1,12 +1,14 @@
-from typing import Any, Dict, Union
+from typing import Union
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
-from app.api.endpoints.mock_data import mock_property_metadata, mock_property_data, mock_enriched_data
-from app.schemas.real_estate import Property
-from app.schemas.tools import SaveClientPreferencesResponse, PropertyLookupRequest, EnrichPropertyDataRequest, \
-    EnrichPropertyDataResponse, GetEnrichmentDataRequest, GetEnrichmentDataResponse
+from app.schemas.real_estate import Property, Client, RealEstateAgent
+from app.schemas.tools import PropertyLookupRequest, EnrichPropertyDataRequest, PreferencesRequest, LookupRequest, \
+    SchedulerReminderRequest
+from app.services.client_service import ClientService
 from app.services.property_service import PropertyService
+from app.services.real_estate_agent_service import RealEstateAgentService
+from app.tasks import trigger_scheduled_remainder
 
 property_router = APIRouter()
 
@@ -18,44 +20,48 @@ def property_lookup(request: PropertyLookupRequest):
     return property_service_response
 
 
-@property_router.post("/enrich_property", response_model=Union[str, Property])
+@property_router.post("/enrich_property_data", response_model=Union[str, Property])
 def enrich_property_data(request: EnrichPropertyDataRequest):
-    if request.property_id in mock_enriched_data:
-        return EnrichPropertyDataResponse(property_id=request.property_id,
-                                          enriched_data=mock_enriched_data[request.property_id])
-    else:
-        raise HTTPException(status_code=404, detail="Property not found")
+    property_service_response = PropertyService().enrich_property(request.property_slug,
+                                                                  real_estate_agent_id=request.real_estate_agent_id,
+                                                                  request_details=request.request_details)
+
+    return property_service_response
 
 
-#
-#
-#
-#
-#
-
-@property_router.post("/get_enrichment_data", response_model=GetEnrichmentDataResponse)
-def get_enrichment_data(request: GetEnrichmentDataRequest):
-    if request.property_id in mock_enriched_data:
-        data = mock_enriched_data[request.property_id].get(request.data_type, {})
-        return GetEnrichmentDataResponse(property_id=request.property_id, data={request.data_type: data})
-    else:
-        raise HTTPException(status_code=404, detail="Property not found")
+@property_router.post("/client_profile_lookup", response_model=Union[str, Client])
+def client_profile_lookup(request: LookupRequest):
+    client = ClientService().lookup(whatsapp_number=request.whatsapp_number)
+    return client
 
 
-@property_router.post("/save_metadata", response_model=SaveClientPreferencesResponse)
-def save_property_metadata(property_id: int, metadata_key: str, metadata_value: Any):
-    if property_id in mock_property_data:
-        if property_id not in mock_property_metadata:
-            mock_property_metadata[property_id] = {}
-        mock_property_metadata[property_id][metadata_key] = metadata_value
-        return SaveClientPreferencesResponse(status="Property metadata saved successfully")
-    else:
-        raise HTTPException(status_code=404, detail="Property not found")
+@property_router.post("/save_client_memory_preferences", response_model=str)
+def save_client_memory_preferences(request: PreferencesRequest):
+    client = ClientService().save_client_memory(whatsapp_number=request.whatsapp_number,
+                                                parameter_name=request.parameter_name,
+                                                parameter_value_description=request.parameter_value_description)
+
+    return client
 
 
-@property_router.get("/get_metadata/{property_id}", response_model=Dict[str, Any])
-def get_property_metadata(property_id: int):
-    if property_id in mock_property_metadata:
-        return mock_property_metadata[property_id]
-    else:
-        raise HTTPException(status_code=404, detail="Property metadata not found")
+@property_router.post("/save_agent_memory_preferences", response_model=str)
+def save_agent_memory_preferences(request: PreferencesRequest):
+    agent = RealEstateAgentService().save_agent_memory(whatsapp_number=request.whatsapp_number,
+                                                       parameter_name=request.parameter_name,
+                                                       parameter_value_description=request.parameter_value_description)
+
+    return agent
+
+
+@property_router.post("/retrieve_agent_data", response_model=Union[str, RealEstateAgent])
+def retrieve_agent_data(request: LookupRequest):
+    agent = RealEstateAgentService().lookup(whatsapp_number=request.whatsapp_number)
+    return agent
+
+
+@property_router.post("/schedule_remainder")
+def schedule_remainder(request: SchedulerReminderRequest):
+    trigger_scheduled_remainder.apply_async(args=[request.real_estate_agent_id, request.remainder_description],
+                                            countdown=request.remainder_time_in_seconds)
+
+    return {"message": "Remainder scheduled successfully."}

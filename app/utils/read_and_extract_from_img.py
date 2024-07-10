@@ -28,7 +28,7 @@ marvin.types.ImageUrl = CustomImageUrl
 
 from app.core.settings import settings
 from app.utils.costs_calculator import calculate_price, CompletionUsage
-from app.utils.custom_marvin.custom_marvin_extractor import extract_from_image
+from app.utils.custom_marvin.custom_marvin_extractor import custom_data_extractor
 from app.utils.slug import url_to_slug
 from app.utils.timer import Timer
 
@@ -112,7 +112,7 @@ def extract_data_from_image(image: Union[str, bytes], target: Union[BaseModel, T
         default_prompt = "You're an expert on data extraction from images. Extract the data following your instructions schema."
         prompt = custom_prompt or default_prompt
 
-        results: ChatResponse = extract_from_image(
+        results: ChatResponse = custom_data_extractor(
             img,
             target=target,
             instructions=prompt,

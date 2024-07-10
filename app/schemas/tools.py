@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Union
+from typing import Dict, Any, Union
 
 from pydantic import BaseModel
 
@@ -11,6 +11,7 @@ class PropertyLookupRequest(BaseModel):
 class EnrichPropertyDataRequest(BaseModel):
     property_slug: str
     request_details: str
+    real_estate_agent_id: Union[str, int]
 
 
 class EnrichPropertyDataResponse(BaseModel):
@@ -18,8 +19,8 @@ class EnrichPropertyDataResponse(BaseModel):
     enriched_data: Dict[str, Any]
 
 
-class ClientProfileLookupRequest(BaseModel):
-    client_id: str
+class LookupRequest(BaseModel):
+    whatsapp_number: str
 
 
 class ClientProfileLookupResponse(BaseModel):
@@ -37,36 +38,13 @@ class GetEnrichmentDataResponse(BaseModel):
     data: Dict[str, Any]
 
 
-class SaveClientPreferencesRequest(BaseModel):
-    client_id: str
-    preferences: Dict[str, Any]
+class PreferencesRequest(BaseModel):
+    whatsapp_number: str
+    parameter_name: str
+    parameter_value_description: str
 
 
-class SaveClientPreferencesResponse(BaseModel):
-    status: str
-
-
-class GetCustomizedRecommendationsRequest(BaseModel):
-    property_id: str
-    client_id: str
-
-
-class GetCustomizedRecommendationsResponse(BaseModel):
-    recommendations: List[str]
-
-
-class StoreAgentDataRequest(BaseModel):
-    agent_id: str
-    interaction_data: Dict[str, Any]
-
-
-class StoreAgentDataResponse(BaseModel):
-    status: str
-
-
-class RetrieveAgentDataRequest(BaseModel):
-    agent_id: str
-
-
-class RetrieveAgentDataResponse(BaseModel):
-    interaction_data: Dict[str, Any]
+class SchedulerReminderRequest(BaseModel):
+    real_estate_agent_id: Union[str, int]
+    remainder_description: Dict[str, Any]
+    remainder_time_in_seconds: int

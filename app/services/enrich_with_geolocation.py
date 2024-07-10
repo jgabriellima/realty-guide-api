@@ -104,9 +104,9 @@ Conveniência: Várias escolas e universidades de alto nível nas proximidades, 
 Essas são ótimas informações que podem ajudar a impressionar potenciais inquilinos, demonstrando que o imóvel não só é confortável e bem equipado, mas também está localizado em uma área estratégica de Florianópolis.
 """
 
-from app.utils.custom_marvin.custom_marvin_extractor import extract_from_image
+from app.utils.custom_marvin.custom_marvin_extractor import custom_data_extractor
 
-results: ChatResponse = extract_from_image(
+results: ChatResponse = custom_data_extractor(
     INPUT_DATA,
     target=Property,
     instructions="You are an intelligent AI assistant specialized in extracting geolocation, spatial, and neighborhood data about real estate properties. Please structure the output according to the specified schema.",

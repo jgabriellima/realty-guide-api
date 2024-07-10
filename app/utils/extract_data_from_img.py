@@ -9,7 +9,7 @@ from marvin.types import ChatResponse
 from app.utils.costs_calculator import calculate_price, CompletionUsage
 from app.utils.timer import Timer
 
-from app.utils.custom_marvin.custom_marvin_extractor import extract_from_image
+from app.utils.custom_marvin.custom_marvin_extractor import custom_data_extractor
 import marvin
 
 from app.schemas.real_estate import Property
@@ -21,7 +21,7 @@ img = marvin.Image(
 )
 
 with Timer("Image Data Extraction"):
-    results: ChatResponse = extract_from_image(img,
+    results: ChatResponse = custom_data_extractor(img,
                                                target=Property,
                                                instructions="You're a expert on data extraction from images. Extract the data following your instructions schema",
                                                model_kwargs={"model": "gpt-4o", "temperature": 0})

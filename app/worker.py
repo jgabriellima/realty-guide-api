@@ -1,6 +1,5 @@
 from celery import Celery
 from celery.utils.log import get_logger
-
 from app.core.settings import settings
 
 logger = get_logger(__name__)
@@ -28,8 +27,12 @@ celery.conf.update(
     task_acks_late=True,  # Acknowledge tasks only after they have been executed
     task_reject_on_worker_lost=True,  # Reject tasks if worker process is lost
     worker_max_tasks_per_child=100,  # Restart workers after they have processed a certain number of tasks
-)
-
-celery.conf.update(
-    result_expires=300,
+    result_expires=300,  # Results expire after 5 minutes
+    broker_transport_options={
+        'max_retries': 3,
+        'interval_start': 0,
+        'interval_step': 0.2,
+        'interval_max': 0.5,
+        'visibility_timeout': 3600,  # 1 hour visibility timeout for the broker
+    }
 )

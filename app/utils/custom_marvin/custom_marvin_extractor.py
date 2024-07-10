@@ -137,7 +137,7 @@ async def custom_extract_async(
 
 
 @traceable(run_type="llm")
-def extract_from_image(
+def custom_data_extractor(
         data: FN_INPUT_TYPES,
         target: type[T] = None,
         instructions: Optional[str] = None,

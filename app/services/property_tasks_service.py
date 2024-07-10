@@ -8,9 +8,9 @@ from pydantic import BaseModel
 
 from app.core.settings import settings
 from app.schemas.real_estate import Property
-from app.services.assistants.geo_assistant import geo_assistant
+from app.services.assistants.enrich_assistant import enrich_assistant
 from app.utils.costs_calculator import calculate_price, CompletionUsage
-from app.utils.custom_marvin.custom_marvin_extractor import extract_from_image
+from app.utils.custom_marvin.custom_marvin_extractor import custom_data_extractor
 from app.utils.html_injection import generate_script_to_mark_elements
 from app.utils.slug import url_to_slug
 from app.utils.timer import Timer
@@ -19,6 +19,8 @@ load_dotenv()
 import marvin
 from marvin.types import ChatResponse, MarvinType, Run
 from tenacity import retry, stop_after_attempt, wait_fixed
+
+logger = logging.getLogger("PropertyTasksService")
 
 
 class CustomImageUrl(MarvinType):
@@ -82,7 +84,7 @@ class PropertyLookup:
             default_prompt = "You're an expert on data extraction from images. Extract the data following your instructions schema."
             prompt = custom_prompt or default_prompt
 
-            results: ChatResponse = extract_from_image(
+            results: ChatResponse = custom_data_extractor(
                 img,
                 target=target,
                 instructions=prompt,
@@ -200,7 +202,7 @@ class PropertyLookup:
             logging.error(f"Unexpected error while processing URL {target_url}: {e}")
             return None
 
-    def enrich_property_metadata(self, property: Property, query: str = None) -> Property:
+    def enrich_property_metadata(self, property: Property, query: str = None) -> Union[None, Property]:
         """
         Enriches the property metadata by adding additional information to the property metadata list.
 
@@ -213,44 +215,36 @@ class PropertyLookup:
         if not property:
             return None
 
-        property_data = f"<property>{property.model_dump_json()}</property>"
-        result: Run = geo_assistant(
-            f"{property_data}. Query/Commands: {query or 'Meu cliente está interessado nesse imóvel. Vamos enriquecer as informações?'}")
+        result: Run = enrich_assistant(query, property.model_dump_json())
 
         assistant_only = [msg for msg in result.messages if msg.role == "assistant"]
-        assistant_only.pop(0)
+        if len(assistant_only) > 1:
+            assistant_only.pop(0)
 
         all_messages = []
         for ao in assistant_only:
             all_messages.append(ao.content[0].text.value)
 
+        if not all_messages:
+            logger.error("No messages found in the assistant response: ")
+            return None
+
         data_to_extract = '\n'.join(all_messages)
-        results: ChatResponse = extract_from_image(
-            f" <data_to_extract>{data_to_extract}</data_to_extract>",
+
+        results: ChatResponse = custom_data_extractor(
+            f" <property>{property.model_dump_json()}</property> | <data_to_extract>{data_to_extract}</data_to_extract>",
             target=Property,
-            instructions="You are an intelligent AI assistant specialized in extracting geolocation, spatial, and neighborhood data about real estate properties. Please structure the output according to the specified schema.",
+            instructions="You are an intelligent AI assistant specialized in Data enrichment. Enrich the property metadata with the data extracted from the assistant. Only return the new enriched property metadata, not the exisiting ones.",
             model_kwargs={
                 "model": "gpt-4o",
                 "temperature": 0.0,
             }
         )
 
-        target_data = [extracted_data.dict() for extracted_data in results.tool_outputs[0]]
+        target_data = [extracted_data for extracted_data in results.tool_outputs[0]]
 
-        prop_final = property.to_dict()
-        prop_metadata = prop_final.get("property_metadata") + target_data[0].get("property_metadata")
-        prop_final.update({"property_metadata": prop_metadata})
+        logger.info(f"target_data: {target_data}")
 
-        return Property(**prop_final)
-
-
-if __name__ == '__main__':
-    url = "https://www.gralhaalugueis.com.br/imovel/aluguel+apartamento+2-quartos+itacorubi+florianopolis+sc+125,51m2+rs6000/1569"
-    service = PropertyTasksService(debug=True)
-    result: Property = service.process_url(url)
-    print(result.model_dump_json())
-
-    # print(generate_script_to_mark_elements(
-    #     mark_image=False, mark_map=True, remove_headers=True, remove_nav=False, remove_footers=True,
-    #     remove_ads=True, remove_forms=True
-    # ))
+        if target_data:
+            enriched_property = target_data[0]
+            return enriched_property

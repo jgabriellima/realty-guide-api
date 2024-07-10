@@ -13,6 +13,7 @@ RETURNS TABLE(
     full_address TEXT,
     property_metadata JSONB
 ) AS $$
+
 BEGIN
 RETURN QUERY
 SELECT
@@ -30,7 +31,7 @@ SELECT
     jsonb_agg(jsonb_build_object('parameter_name', pm.parameter_name, 'parameter_value_description', pm.parameter_value_description)) AS property_metadata
 FROM real_estate.property p
          LEFT JOIN real_estate.property_metadata pm ON p.id = pm.property_id
-WHERE p.url = url
+WHERE (p.url = p_url OR p.slug = p_slug)
 GROUP BY p.id;
 END;
 $$ LANGUAGE plpgsql;

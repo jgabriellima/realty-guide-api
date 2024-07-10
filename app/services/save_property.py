@@ -1,14 +1,14 @@
-from typing import List, Optional
+from typing import List
 
-from pydantic import BaseModel
-from supabase import create_client, Client
+from supabase import Client
 
 from app.core.db.supabase_conn import SupabaseDB
-from app.schemas.real_estate import Property
+from app.schemas.real_estate import Property, PropertyMetadata
+from app.setup_logging import setup_logging
 
 # Supabase connection
 supabase: Client = SupabaseDB().client
-
+logger = setup_logging("SavePropertyService")
 
 def save_property(property_data: Property):
     # Insert the property
@@ -32,6 +32,17 @@ def save_property(property_data: Property):
     else:
         return {"status": "error", "message": response.json()}
 
+
+def save_metadata(property_id: int, property_metadata: List[PropertyMetadata]):
+    # Insert the property metadata
+    logger.info(f"Saving metadata for property {property_id}")
+    for metadata in property_metadata:
+        metadata_dict = metadata.model_dump()
+        del metadata_dict["id"]
+        metadata_dict["property_id"] = property_id
+        supabase.table("property_metadata").insert(metadata_dict).execute()
+
+    return {"status": "success", "message": "Metadata saved successfully"}
 
 # # Example usage
 # property_data = Property(

@@ -1,9 +1,10 @@
 import time
 
-from app.schemas.real_estate import Property
+from app.schemas.real_estate import Property, RealEstateAgent
 from app.services.property_tasks_service import PropertyLookup
-from app.services.save_property import save_property
+from app.services.save_property import save_property, save_metadata
 from app.setup_logging import setup_logging
+from app.utils.parsers import parse_to_schema
 from app.worker import celery
 
 logger = setup_logging(celery=True)
@@ -58,6 +59,9 @@ def create_task(task_type):
 
 @celery.task(name="process_property_url", base=BaseTaskWithUpdate, bind=True)
 def process_property_url(self, url: str):
+    """
+    Process the property URL and save the property data
+    """
     task_id = self.request.id
     logger.info(f"Started task {task_id} for URL: {url}")
     time.sleep(5)
@@ -68,4 +72,45 @@ def process_property_url(self, url: str):
 
     logger.info(f"Task {task_id} completed")
 
+    return True
+
+
+@celery.task(name="enrich_property_data", base=BaseTaskWithUpdate, bind=True)
+def enrich_property_data(self, property_slug, request_details):
+    """
+    Enrich the property data with the request details
+    """
+    supabase = SupabaseDB().client
+    res = supabase.schema('real_estate').rpc("get_property_with_metadata",
+                                             params={"p_url": None,
+                                                     "p_slug": property_slug}).execute()
+
+    # enrich property
+    property: Property = parse_to_schema(Property, res.data)
+    logger.info(f"Enriching property: {property}")
+    result: Property = PropertyLookup().enrich_property_metadata(property, request_details)
+
+    if not result:
+        logger.info(f"Property not enriched: {property}")
+
+    logger.info(f"Enriched property: {result}")
+    save_metadata(property.id, result.property_metadata)
+    # save the property
+    return True
+
+
+@celery.task(name="trigger_scheduled_remainder", base=BaseTaskWithUpdate, bind=True)
+def trigger_scheduled_remainder(self, real_estate_agent_id, remainder_description):
+    """
+    Trigger a scheduled remainder for a real estate agent
+    """
+    supabase = SupabaseDB().client
+    agent_data = supabase.schema('real_estate').rpc("get_agent_with_metadata",
+                                                    params={"p_whatsapp": None, "p_id": real_estate_agent_id}).execute()
+
+    agent: RealEstateAgent = parse_to_schema(RealEstateAgent, agent_data.data)
+    # call JambuAI Service passing the agent.whatsapp and the message
+    message = f"This is a scheduled remainder: {remainder_description}"
+    logger.info(f"Sending scheduled remainder to agent: {agent.whatsapp} - {message}")
+    
     return True
