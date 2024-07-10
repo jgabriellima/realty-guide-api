@@ -31,5 +31,6 @@ def setup_logging(name=None, celery=False):
         from celery.utils.log import get_logger
         logger = get_logger(__name__)
         logger.addHandler(posthog_handler)
+        logger.addHandler(handler)
 
     return logger

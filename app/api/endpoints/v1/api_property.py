@@ -1,23 +1,21 @@
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 from fastapi import APIRouter, HTTPException
 
 from app.api.endpoints.mock_data import mock_property_metadata, mock_property_data, mock_enriched_data
-from app.schemas.tools import SaveClientPreferencesResponse, PropertyLookupRequest, PropertyLookupResponse, \
-    EnrichPropertyDataRequest, EnrichPropertyDataResponse, GetEnrichmentDataRequest, GetEnrichmentDataResponse
+from app.schemas.real_estate import Property
+from app.schemas.tools import SaveClientPreferencesResponse, PropertyLookupRequest, EnrichPropertyDataRequest, \
+    EnrichPropertyDataResponse, GetEnrichmentDataRequest, GetEnrichmentDataResponse
+from app.services.property_service import PropertyService
 
 property_router = APIRouter()
 
 
-@property_router.post("/lookup", response_model=PropertyLookupResponse)
+@property_router.post("/lookup", response_model=Union[str, Property])
 def property_lookup(request: PropertyLookupRequest):
+    property_service_response = PropertyService().lookup(request.url, real_estate_agent_id=request.real_estate_agent_id)
 
-
-
-    if request.url.endswith("/123"):
-        return PropertyLookupResponse(property_id="123", details=mock_property_data["123"])
-    else:
-        raise HTTPException(status_code=404, detail="Property not found")
+    return property_service_response
 
 
 @property_router.post("/enrich", response_model=EnrichPropertyDataResponse)

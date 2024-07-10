@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel
 
 from app.core.settings import settings
-from app.schemas.property import Property
+from app.schemas.real_estate import Property
 from app.services.assistants.geo_assistant import geo_assistant
 from app.utils.costs_calculator import calculate_price, CompletionUsage
 from app.utils.custom_marvin.custom_marvin_extractor import extract_from_image
@@ -224,8 +224,9 @@ class PropertyTasksService:
         for ao in assistant_only:
             all_messages.append(ao.content[0].text.value)
 
+        data_to_extract = '\n'.join(all_messages)
         results: ChatResponse = extract_from_image(
-            f" <data_to_extract>{'\n'.join(all_messages)}</data_to_extract>",
+            f" <data_to_extract>{data_to_extract}</data_to_extract>",
             target=Property,
             instructions="You are an intelligent AI assistant specialized in extracting geolocation, spatial, and neighborhood data about real estate properties. Please structure the output according to the specified schema.",
             model_kwargs={
@@ -244,12 +245,12 @@ class PropertyTasksService:
 
 
 if __name__ == '__main__':
-    # url = "https://www.gralhaalugueis.com.br/imovel/aluguel+apartamento+2-quartos+itacorubi+florianopolis+sc+125,51m2+rs6000/1569"
-    # service = PropertyDataService(debug=True)
-    # result: Property = service.process_url(url)
-    # print(result.model_dump_json())
+    url = "https://www.gralhaalugueis.com.br/imovel/aluguel+apartamento+2-quartos+itacorubi+florianopolis+sc+125,51m2+rs6000/1569"
+    service = PropertyTasksService(debug=True)
+    result: Property = service.process_url(url)
+    print(result.model_dump_json())
 
-    print(generate_script_to_mark_elements(
-        mark_image=False, mark_map=True, remove_headers=True, remove_nav=False, remove_footers=True,
-        remove_ads=True, remove_forms=True
-    ))
+    # print(generate_script_to_mark_elements(
+    #     mark_image=False, mark_map=True, remove_headers=True, remove_nav=False, remove_footers=True,
+    #     remove_ads=True, remove_forms=True
+    # ))

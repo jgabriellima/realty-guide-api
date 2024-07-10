@@ -1,15 +1,11 @@
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Union
 
 from pydantic import BaseModel
 
 
 class PropertyLookupRequest(BaseModel):
     url: str
-
-
-class PropertyLookupResponse(BaseModel):
-    property_id: str
-    details: Dict[str, Any]
+    real_estate_agent_id: Union[str, int]
 
 
 class EnrichPropertyDataRequest(BaseModel):

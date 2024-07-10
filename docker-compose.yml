@@ -19,9 +19,9 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
-    depends_on:
-      - rabbitmq
-      - redis
+#    depends_on:
+#      - rabbitmq
+#      - redis
 
   worker:
     build: .
@@ -39,38 +39,39 @@ services:
       - POSTHOG_HOST=${POSTHOG_HOST}
     volumes:
       - .:/app
-    depends_on:
-      - rabbitmq
-      - redis
+#    depends_on:
+#      - rabbitmq
+#      - redis
 
   flower:
     image: mher/flower
     environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
       - FLOWER_PORT=5555
+      - FLOWER_UNAUTHENTICATED_API=true
     ports:
       - "5555:5555"
-    depends_on:
-      - rabbitmq
-
-  rabbitmq:
-    image: "rabbitmq:3-management"
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
-    volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
-
-  redis:
-    image: "redis:latest"
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-
-volumes:
-  rabbitmq-data:
-  redis-data:
+#    depends_on:
+#      - rabbitmq
+#
+#  rabbitmq:
+#    image: "rabbitmq:3-management"
+#    ports:
+#      - "5672:5672"
+#      - "15672:15672"
+#    environment:
+#      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+#      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+#    volumes:
+#      - rabbitmq-data:/var/lib/rabbitmq
+#
+#  redis:
+#    image: "redis:latest"
+#    ports:
+#      - "6379:6379"
+#    volumes:
+#      - redis-data:/data
+#
+#volumes:
+#  rabbitmq-data:
+#  redis-data:

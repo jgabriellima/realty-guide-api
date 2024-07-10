@@ -2,7 +2,7 @@ import httpx
 from fastapi import APIRouter, HTTPException, Query
 from starlette.responses import HTMLResponse
 
-from app.utils.html_injection import generate_script
+from app.utils.html_injection import generate_script_to_mark_elements
 
 page_loader = APIRouter()
 
@@ -13,8 +13,8 @@ async def inject_script(url: str, mark_image: bool = False, mark_map: bool = Fal
     specific_ids_list = specific_ids.split(',') if specific_ids else []
     specific_classes_list = specific_classes.split(',') if specific_classes else []
 
-    script = generate_script(mark_image=mark_image, mark_map=mark_map, mark_all=mark_all,
-                             specific_ids=specific_ids_list, specific_classes=specific_classes_list)
+    script = generate_script_to_mark_elements(mark_image=mark_image, mark_map=mark_map, mark_all=mark_all,
+                                              specific_ids=specific_ids_list, specific_classes=specific_classes_list)
 
     async with httpx.AsyncClient() as client:
         response = await client.get(url)

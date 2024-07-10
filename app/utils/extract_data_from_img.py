@@ -12,7 +12,7 @@ from app.utils.timer import Timer
 from app.utils.custom_marvin.custom_marvin_extractor import extract_from_image
 import marvin
 
-from app.schemas.property import Property
+from app.schemas.real_estate import Property
 
 input_filename = 'ibagy-com-br-imovel-123730-casa-em-condominio-3-quartos-jardim-ribeirao-ribeirao-da-ilha-florianopolis.png'
 

@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from marvin.beta.assistants.runs import Run
 
-from app.schemas.property import Property
+from app.schemas.real_estate import Property
 from app.services.assistants.geo_assistant import geo_assistant
 
 with open(

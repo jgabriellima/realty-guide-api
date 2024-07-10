@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  api:
+    extends:
+      file: docker-compose.yml
+      service: api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      - ENVIRONMENT=development
+    env_file:
+      - .env.development
+    volumes:
+      - .:/app
+
+  worker:
+    extends:
+      file: docker-compose.yml
+      service: worker
+    command: watchmedo auto-restart --recursive --pattern="*.py" --directory=app -- python app/worker.py
+    environment:
+      - ENVIRONMENT=development
+      - MODE=worker
+    env_file:
+      - .env.development
+    volumes:
+      - .:/app
+
+  flower:
+    image: mher/flower
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - FLOWER_PORT=5555
+    env_file:
+      - .env.development
+    ports:
+      - "5555:5555"
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  rabbitmq-data:
+  redis-data:

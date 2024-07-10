@@ -5,7 +5,7 @@ from typing import Union, Optional, Dict, Any, List, TypeVar
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
-from app.schemas.property import Property
+from app.schemas.real_estate import Property
 from app.utils.html_injection import generate_script_to_mark_elements
 
 load_dotenv()

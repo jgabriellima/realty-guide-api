@@ -1,7 +1,7 @@
 from firecrawl import FirecrawlApp
 
 from app.core.settings import settings
-from app.schemas.property import Property
+from app.schemas.real_estate import Property
 
 
 def get_property_data(url: str):

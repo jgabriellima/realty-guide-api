@@ -1,0 +1,5 @@
+grant usage on schema "real_estate" to anon;
+grant usage on schema "real_estate" to authenticated;
+
+GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA "real_estate" TO authenticated;
+GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA "real_estate" TO anon;

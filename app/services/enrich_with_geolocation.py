@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from marvin.types import ChatResponse
 
-from app.schemas.property import Property
+from app.schemas.real_estate import Property
 
 INPUT_DATA = """
 Informações Adicionais
