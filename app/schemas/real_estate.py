@@ -49,7 +49,7 @@ class Client(BaseModel):
     Client schema
     """
     id: Optional[int] = None
-    name: str
+    name: Optional[str] = None
     whatsapp: str
 
 
