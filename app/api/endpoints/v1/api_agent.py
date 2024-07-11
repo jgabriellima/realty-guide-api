@@ -3,7 +3,8 @@ from typing import Union
 from fastapi import APIRouter
 
 from app.schemas.real_estate import RealEstateAgent
-from app.schemas.tools import PreferencesRequest, LookupRequest, SchedulerReminderRequest
+from app.schemas.tools import SchedulerReminderRequest, AgentPreferencesRequest, \
+    AgentLookupRequest
 from app.services.real_estate_agent_service import RealEstateAgentService
 from app.tasks import trigger_scheduled_remainder
 
@@ -11,8 +12,8 @@ agent_router = APIRouter()
 
 
 @agent_router.post("/save_agent_memory_preferences", operation_id="save_agent_memory_preferences", response_model=str)
-def save_agent_memory_preferences(request: PreferencesRequest):
-    agent = RealEstateAgentService().save_agent_memory(whatsapp_number=request.whatsapp_number,
+def save_agent_memory_preferences(request: AgentPreferencesRequest):
+    agent = RealEstateAgentService().save_agent_memory(real_estate_agent_id=request.real_estate_agent_id,
                                                        parameter_name=request.parameter_name,
                                                        parameter_value_description=request.parameter_value_description)
 
@@ -20,8 +21,8 @@ def save_agent_memory_preferences(request: PreferencesRequest):
 
 
 @agent_router.post("/agent_lookup", operation_id="agent_lookup", response_model=Union[str, RealEstateAgent])
-def agent_lookup(request: LookupRequest):
-    agent = RealEstateAgentService().lookup(whatsapp_number=request.whatsapp_number)
+def agent_lookup(request: AgentLookupRequest):
+    agent = RealEstateAgentService().lookup(whatsapp_number=request.agent_whatsapp_number)
     return agent
 
 

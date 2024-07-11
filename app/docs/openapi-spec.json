@@ -483,13 +483,24 @@
           },
           "parameter_value_description": {
             "type": "string"
+          },
+          "real_estate_agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              }
+            ]
           }
         },
         "type": "object",
         "required": [
           "whatsapp_number",
           "parameter_name",
-          "parameter_value_description"
+          "parameter_value_description",
+          "real_estate_agent_id"
         ]
       },
       "Task": {

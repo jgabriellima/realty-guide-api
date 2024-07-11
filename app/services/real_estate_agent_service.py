@@ -8,6 +8,11 @@ from app.utils.parsers import parse_to_schema
 
 logger = setup_logging("RealEstateAgentService")
 
+SYSTEM_VIOLATION = (
+    "Agent not found with ID: {id}. This can be a violation of the terms: "
+    "'An agent must be created by the admin first before start to use the system.'. "
+    "CAUTION: Do not continue the conversation!")
+
 
 class RealEstateAgentService(GenericTaskService):
 
@@ -20,28 +25,23 @@ class RealEstateAgentService(GenericTaskService):
         agent: RealEstateAgent = parse_to_schema(RealEstateAgent, agent_data.data)
 
         if not agent:
-            return (f"Agent not found with whatsapp number: {whatsapp_number}. Before proceed and try again, "
-                    f"check if this is the right number. if yes, call `save_agent_memory` endpoint to save this real estate agent.")
+            return SYSTEM_VIOLATION.format(id=whatsapp_number)
 
         return agent
 
-    def save_agent_memory(self, whatsapp_number: str, parameter_name: str, parameter_value_description: str) -> Union[
+    def save_agent_memory(self, real_estate_agent_id: Union[int, str], parameter_name: str,
+                          parameter_value_description: str) -> Union[
         str, RealEstateAgent]:
         supabase = SupabaseDB().client
 
         agent_data = supabase.schema('real_estate').rpc("get_agent_with_metadata",
-                                                        params={"p_whatsapp": whatsapp_number, "p_id": None}).execute()
+                                                        params={"p_whatsapp": None,
+                                                                "p_id": real_estate_agent_id}).execute()
         logger.info(f"Data::get_agent_with_metadata: {agent_data}")
         agent: RealEstateAgent = parse_to_schema(RealEstateAgent, agent_data.data)
 
         if not agent:
-            # create the new agent
-            agent_data = supabase.schema('real_estate').table("real_estate_agents").insert({
-                "whatsapp": whatsapp_number
-            }).execute()
-            agent: RealEstateAgent = parse_to_schema(RealEstateAgent, agent_data.data)
-
-            logger.info(f"Agent created by whatsapp: `{whatsapp_number}`")
+            return SYSTEM_VIOLATION.format(id=real_estate_agent_id)
 
         # save the agent metadata
         agent_metadata = supabase.schema('real_estate').table("agent_metadata").insert({

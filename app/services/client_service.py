@@ -21,27 +21,27 @@ class ClientService(GenericTaskService):
 
         if not client:
             client: Client = parse_to_schema(Client, supabase.schema('real_estate').table("clients").insert(
-                {"whatsapp": whatsapp_number}).execute().data)
+                {"whatsapp": whatsapp_number, "real_estate_agent_id": real_estate_agent_id}).execute().data)
             logger.info(f"Client created by whatsapp: `{whatsapp_number}`")
-            # return (f"Client not found with whatsapp number: {whatsapp_number}. Before proceed and try again, "
-            #         f"check if this is the right number. if yes, call `save_client_memory` endpoint to save this client.")
 
         return client
 
-    def save_client_memory(self, whatsapp_number: str,
+    def save_client_memory(self, client_id: Union[int, str],
                            parameter_name: str,
                            parameter_value_description: str,
                            real_estate_agent_id: Union[None, int] = None) -> Union[str, Client]:
         supabase = SupabaseDB().client
 
         client_data = supabase.schema('real_estate').rpc("get_client_with_metadata",
-                                                         params={"p_whatsapp": whatsapp_number}).execute()
+                                                         params={"p_whatsapp": None,
+                                                                 "p_client_id": client_id}).execute()
         logger.info(f"Data::get_client_with_metadata: {client_data}")
         client: Client = parse_to_schema(Client, client_data.data)
 
         if not client:
-            client: Client = parse_to_schema(Client, supabase.schema('real_estate').table("client").insert({"whatsapp": whatsapp_number}).execute().data)
-            logger.info(f"Client created by whatsapp: `{whatsapp_number}`")
+            logger.info(f"Client not found with id: `{client_id}`")
+            return (f"Client not found with id: `{client_id}`. Use the `client_lookup` tool first to initiate "
+                    f"the client and then you'll be able to save memories and preferences.")
 
         metadata_to_insert = {
             "client_id": client.id,

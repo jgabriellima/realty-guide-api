@@ -23,7 +23,12 @@ class LookupRequest(BaseModel):
     whatsapp_number: str
 
 
-class ClientLookupRequest(LookupRequest):
+class AgentLookupRequest(BaseModel):
+    agent_whatsapp_number: str
+
+
+class ClientLookupRequest(BaseModel):
+    client_whatsapp_number: str
     real_estate_agent_id: Union[str, int]
 
 
@@ -49,7 +54,20 @@ class PreferencesRequest(BaseModel):
     real_estate_agent_id: Optional[int] = None
 
 
+class AgentPreferencesRequest(BaseModel):
+    parameter_name: str
+    parameter_value_description: str
+    real_estate_agent_id: Optional[int] = None
+
+
+class ClientPreferencesRequest(BaseModel):
+    client_id: int
+    parameter_name: str
+    parameter_value_description: str
+    real_estate_agent_id: int
+
+
 class SchedulerReminderRequest(BaseModel):
-    real_estate_agent_id: Union[str, int]
-    remainder_description: Dict[str, Any]
+    real_estate_agent_id: int
+    remainder_description: str
     remainder_time_in_seconds: int
