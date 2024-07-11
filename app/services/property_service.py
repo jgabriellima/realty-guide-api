@@ -25,7 +25,8 @@ class PropertyService(GenericTaskService):
     def lookup(self, url: str, real_estate_agent_id: Union[str, int] = None) -> Union[str, Property]:
         supabase = SupabaseDB().client
 
-        res = supabase.schema('real_estate').rpc("get_property_with_metadata", params={"p_url": url, "p_slug":None}).execute()
+        res = supabase.schema('real_estate').rpc("get_property_with_metadata",
+                                                 params={"p_url": url, "p_slug": None}).execute()
         logger.info(f"Data::get_property_with_metadata: {res}")
 
         property: Property = parse_to_schema(Property, res.data)
@@ -75,8 +76,11 @@ class PropertyService(GenericTaskService):
 
         res: DataCheckerOutput = data_checker(request_details, property.model_dump_json())
         if res.contains_the_answer:
-            property.assistant_instructions = f"The answer for this question can be: `{res.response}`. Check if make sense based on the user's query and provide this information to him."
-            return property
+            property.assistant_instructions = (
+                f"The answer for this query: `{request_details}` can be: `{res.response}`. "
+                f"Check if make sense based on the user's query and provide this information to him with your own words. "
+                f"If necessary, lookup the property for the complete details. ")
+            return property.assistant_instructions
         else:
             params = {
                 "p_real_estate_agent_id": real_estate_agent_id,

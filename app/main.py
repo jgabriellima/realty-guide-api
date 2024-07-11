@@ -69,4 +69,7 @@ async def request_error_internal(request, exc):
 
 @app.get("/", tags=["Base"])
 async def root():
-    return {"message": f"Welcome to the {settings.app_name} API"}
+    return {
+        "message": f"Welcome to the {settings.app_name} API. "
+                   f"Created by João Gabriel Lima - joaogabriellima.eng@gmail.com"
+    }

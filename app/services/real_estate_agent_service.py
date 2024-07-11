@@ -38,7 +38,7 @@ class RealEstateAgentService(GenericTaskService):
             # create the new agent
             agent_data = supabase.schema('real_estate').table("real_estate_agents").insert({
                 "whatsapp": whatsapp_number
-            }).select()
+            }).execute()
             agent: RealEstateAgent = parse_to_schema(RealEstateAgent, agent_data.data)
 
             logger.info(f"Agent created by whatsapp: `{whatsapp_number}`")
@@ -48,7 +48,7 @@ class RealEstateAgentService(GenericTaskService):
             "agent_id": agent.id,
             "parameter_name": parameter_name,
             "parameter_value_description": parameter_value_description
-        }).select()
+        }).execute()
 
         return f"Agent memory saved successfully. {agent_metadata}"
 

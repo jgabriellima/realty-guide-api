@@ -112,5 +112,5 @@ def trigger_scheduled_remainder(self, real_estate_agent_id, remainder_descriptio
     # call JambuAI Service passing the agent.whatsapp and the message
     message = f"This is a scheduled remainder: {remainder_description}"
     logger.info(f"Sending scheduled remainder to agent: {agent.whatsapp} - {message}")
-    
+
     return True

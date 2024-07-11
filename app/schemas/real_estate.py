@@ -111,3 +111,7 @@ class TaskStatus:
     COMPLETED = "completed"
     FAILED = "failed"
     CANCELLED = "cancelled"
+
+
+class TaskStatusRequest(BaseModel):
+    task_id: str

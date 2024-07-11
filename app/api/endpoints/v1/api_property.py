@@ -10,14 +10,14 @@ from app.tasks import trigger_scheduled_remainder
 property_router = APIRouter()
 
 
-@property_router.post("/lookup", response_model=Union[str, Property])
+@property_router.post("/lookup", operation_id="property_lookup", response_model=Union[str, Property])
 def property_lookup(request: PropertyLookupRequest):
     property_service_response = PropertyService().lookup(request.url, real_estate_agent_id=request.real_estate_agent_id)
 
     return property_service_response
 
 
-@property_router.post("/enrich_property_data", response_model=Union[str, Property])
+@property_router.post("/enrich_property_data", operation_id="enrich_property_data", response_model=Union[str, Property])
 def enrich_property_data(request: EnrichPropertyDataRequest):
     property_service_response = PropertyService().enrich_property(request.property_slug,
                                                                   real_estate_agent_id=request.real_estate_agent_id,
