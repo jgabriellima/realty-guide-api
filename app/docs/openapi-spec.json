@@ -293,6 +293,21 @@
       }
     },
     "/v1/agents/schedule_remainder": {
+      "get": {
+        "description": "New endpoint",
+        "responses": {
+          "200": {
+            "description": "New response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "": ""
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
           "Agent"

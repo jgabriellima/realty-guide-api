@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION real_estate.get_property_with_metadata(url TEXT)
+CREATE OR REPLACE FUNCTION real_estate.get_property_with_metadata(p_url TEXT, p_slug TEXT)
 RETURNS TABLE(
     id INT,
     id_reference TEXT,
@@ -6,9 +6,9 @@ RETURNS TABLE(
     description TEXT,
     slug TEXT,
     url TEXT,
-    total_price FLOAT,
-    iptu FLOAT,
-    condominium_fee FLOAT,
+    total_price NUMERIC,
+    iptu NUMERIC,
+    condominium_fee NUMERIC,
     neighborhood TEXT,
     full_address TEXT,
     property_metadata JSONB

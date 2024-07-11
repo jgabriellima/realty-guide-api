@@ -25,7 +25,7 @@ class PropertyService(GenericTaskService):
     def lookup(self, url: str, real_estate_agent_id: Union[str, int] = None) -> Union[str, Property]:
         supabase = SupabaseDB().client
 
-        res = supabase.schema('real_estate').rpc("get_property_with_metadata", params={"p_url": url}).execute()
+        res = supabase.schema('real_estate').rpc("get_property_with_metadata", params={"p_url": url, "p_slug":None}).execute()
         logger.info(f"Data::get_property_with_metadata: {res}")
 
         property: Property = parse_to_schema(Property, res.data)
