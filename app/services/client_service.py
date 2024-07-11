@@ -40,8 +40,7 @@ class ClientService(GenericTaskService):
         client: Client = parse_to_schema(Client, client_data.data)
 
         if not client:
-            client: Client = parse_to_schema(Client, supabase.schema('real_estate').table("clients").insert(
-                {"whatsapp": whatsapp_number}).execute().data)
+            client: Client = parse_to_schema(Client, supabase.schema('real_estate').table("client").insert({"whatsapp": whatsapp_number}).execute().data)
             logger.info(f"Client created by whatsapp: `{whatsapp_number}`")
 
         metadata_to_insert = {
