@@ -4,7 +4,7 @@ from app.core.settings import settings
 def start_sentry():
     import sentry_sdk
     sentry_sdk.init(
-        dsn=settings.SENTRY_DSN,
+        dsn=settings.sentry_dsn,
         # Set traces_sample_rate to 1.0 to capture 100%
         # of transactions for performance monitoring.
         traces_sample_rate=1.0,
@@ -12,4 +12,5 @@ def start_sentry():
         # of sampled transactions.
         # We recommend adjusting this value in production.
         profiles_sample_rate=1.0,
+        environment=settings
     )

@@ -14,7 +14,7 @@
   },
   "servers": [
     {
-      "url": "https://realty-guide-api-production.up.railway.app"
+      "url": "https://wide-tables-tan.loca.lt"
     }
   ],
   "paths": {
@@ -48,7 +48,8 @@
                     {
                       "$ref": "#/components/schemas/Property"
                     }
-                  ]
+                  ],
+                  "title": "Response Property Lookup"
                 }
               }
             }
@@ -66,13 +67,13 @@
         }
       }
     },
-    "/v1/properties/enrich_property_data": {
+    "/v1/properties/query_and_enrich_property_data": {
       "post": {
         "tags": [
           "Property"
         ],
         "summary": "Enrich Property Data",
-        "operationId": "enrich_property_data",
+        "operationId": "query_and_enrich_property_data",
         "requestBody": {
           "content": {
             "application/json": {
@@ -96,7 +97,8 @@
                     {
                       "$ref": "#/components/schemas/Property"
                     }
-                  ]
+                  ],
+                  "title": "Response Query And Enrich Property Data"
                 }
               }
             }
@@ -144,7 +146,8 @@
                     {
                       "$ref": "#/components/schemas/Client"
                     }
-                  ]
+                  ],
+                  "title": "Response Client Lookup"
                 }
               }
             }
@@ -173,7 +176,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PreferencesRequest"
+                "$ref": "#/components/schemas/ClientPreferencesRequest"
               }
             }
           },
@@ -185,7 +188,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "string",
+                  "title": "Response Save Client Memory Preferences"
                 }
               }
             }
@@ -214,7 +218,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PreferencesRequest"
+                "$ref": "#/components/schemas/AgentPreferencesRequest"
               }
             }
           },
@@ -226,7 +230,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "string",
+                  "title": "Response Save Agent Memory Preferences"
                 }
               }
             }
@@ -255,7 +260,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LookupRequest"
+                "$ref": "#/components/schemas/AgentLookupRequest"
               }
             }
           },
@@ -274,7 +279,8 @@
                     {
                       "$ref": "#/components/schemas/RealEstateAgent"
                     }
-                  ]
+                  ],
+                  "title": "Response Agent Lookup"
                 }
               }
             }
@@ -311,7 +317,14 @@
         },
         "responses": {
           "200": {
-            "description": "Successful Response"
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -374,10 +387,73 @@
           }
         }
       }
+    },
+    "/": {
+      "get": {
+        "tags": [
+          "Base"
+        ],
+        "summary": "Root",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AgentLookupRequest": {
+        "properties": {
+          "agent_whatsapp_number": {
+            "type": "string",
+            "title": "Agent Whatsapp Number"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_whatsapp_number"
+        ],
+        "title": "AgentLookupRequest"
+      },
+      "AgentPreferencesRequest": {
+        "properties": {
+          "parameter_name": {
+            "type": "string",
+            "title": "Parameter Name"
+          },
+          "parameter_value_description": {
+            "type": "string",
+            "title": "Parameter Value Description"
+          },
+          "real_estate_agent_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Real Estate Agent Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "parameter_name",
+          "parameter_value_description"
+        ],
+        "title": "AgentPreferencesRequest"
+      },
       "Client": {
         "properties": {
           "id": {
@@ -388,28 +464,37 @@
               {
                 "type": "null"
               }
-            ]
+            ],
+            "title": "Id"
           },
           "name": {
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
           },
           "whatsapp": {
-            "type": "string"
+            "type": "string",
+            "title": "Whatsapp"
           }
         },
         "type": "object",
         "required": [
-          "name",
           "whatsapp"
-        ]
+        ],
+        "title": "Client",
+        "description": "Client schema"
       },
-      "EnrichPropertyDataRequest": {
+      "ClientLookupRequest": {
         "properties": {
-          "property_slug": {
-            "type": "string"
-          },
-          "request_details": {
-            "type": "string"
+          "client_whatsapp_number": {
+            "type": "string",
+            "title": "Client Whatsapp Number"
           },
           "real_estate_agent_id": {
             "anyOf": [
@@ -419,15 +504,74 @@
               {
                 "type": "integer"
               }
-            ]
+            ],
+            "title": "Real Estate Agent Id"
           }
         },
         "type": "object",
         "required": [
-          "property_slug",
+          "client_whatsapp_number",
+          "real_estate_agent_id"
+        ],
+        "title": "ClientLookupRequest"
+      },
+      "ClientPreferencesRequest": {
+        "properties": {
+          "client_id": {
+            "type": "integer",
+            "title": "Client Id"
+          },
+          "parameter_name": {
+            "type": "string",
+            "title": "Parameter Name"
+          },
+          "parameter_value_description": {
+            "type": "string",
+            "title": "Parameter Value Description"
+          },
+          "real_estate_agent_id": {
+            "type": "integer",
+            "title": "Real Estate Agent Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_id",
+          "parameter_name",
+          "parameter_value_description",
+          "real_estate_agent_id"
+        ],
+        "title": "ClientPreferencesRequest"
+      },
+      "EnrichPropertyDataRequest": {
+        "properties": {
+          "property_id": {
+            "type": "integer",
+            "title": "Property Id"
+          },
+          "request_details": {
+            "type": "string",
+            "title": "Request Details"
+          },
+          "real_estate_agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "title": "Real Estate Agent Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "property_id",
           "request_details",
           "real_estate_agent_id"
-        ]
+        ],
+        "title": "EnrichPropertyDataRequest"
       },
       "HTTPValidationError": {
         "properties": {
@@ -435,26 +579,121 @@
             "items": {
               "$ref": "#/components/schemas/ValidationError"
             },
-            "type": "array"
+            "type": "array",
+            "title": "Detail"
           }
         },
-        "type": "object"
+        "type": "object",
+        "title": "HTTPValidationError"
       },
-      "LookupRequest": {
+      "Property": {
         "properties": {
-          "whatsapp_number": {
-            "type": "string"
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "id_reference": {
+            "type": "string",
+            "title": "Id Reference"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "total_price": {
+            "type": "number",
+            "title": "Total Price"
+          },
+          "iptu": {
+            "type": "number",
+            "title": "Iptu"
+          },
+          "condominium_fee": {
+            "type": "number",
+            "title": "Condominium Fee"
+          },
+          "neighborhood": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Neighborhood"
+          },
+          "full_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Address"
+          },
+          "property_metadata": {
+            "items": {
+              "$ref": "#/components/schemas/PropertyMetadata"
+            },
+            "type": "array",
+            "title": "Property Metadata",
+            "default": [
+
+            ]
+          },
+          "assistant_instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assistant Instructions"
           }
         },
         "type": "object",
         "required": [
-          "whatsapp_number"
-        ]
+          "id_reference",
+          "title",
+          "description",
+          "slug",
+          "url",
+          "total_price",
+          "iptu",
+          "condominium_fee"
+        ],
+        "title": "Property",
+        "description": "Property schema"
       },
-      "ClientLookupRequest": {
+      "PropertyLookupRequest": {
         "properties": {
-          "whatsapp_number": {
-            "type": "string"
+          "url": {
+            "type": "string",
+            "title": "Url"
           },
           "real_estate_agent_id": {
             "anyOf": [
@@ -464,44 +703,110 @@
               {
                 "type": "integer"
               }
-            ]
+            ],
+            "title": "Real Estate Agent Id"
           }
         },
         "type": "object",
         "required": [
-          "whatsapp_number",
+          "url",
           "real_estate_agent_id"
-        ]
+        ],
+        "title": "PropertyLookupRequest"
       },
-      "PreferencesRequest": {
+      "PropertyMetadata": {
         "properties": {
-          "whatsapp_number": {
-            "type": "string"
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "property_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Property Id"
           },
           "parameter_name": {
-            "type": "string"
+            "type": "string",
+            "title": "Parameter Name"
           },
           "parameter_value_description": {
-            "type": "string"
-          },
-          "real_estate_agent_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "integer"
-              }
-            ]
+            "type": "string",
+            "title": "Parameter Value Description"
           }
         },
         "type": "object",
         "required": [
-          "whatsapp_number",
           "parameter_name",
-          "parameter_value_description",
-          "real_estate_agent_id"
-        ]
+          "parameter_value_description"
+        ],
+        "title": "PropertyMetadata",
+        "description": "PropertyMetadata schema"
+      },
+      "RealEstateAgent": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "whatsapp": {
+            "type": "string",
+            "title": "Whatsapp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "whatsapp"
+        ],
+        "title": "RealEstateAgent",
+        "description": "RealEstateAgent schema"
+      },
+      "SchedulerReminderRequest": {
+        "properties": {
+          "real_estate_agent_id": {
+            "type": "integer",
+            "title": "Real Estate Agent Id"
+          },
+          "remainder_description": {
+            "type": "string",
+            "title": "Remainder Description"
+          },
+          "remainder_time_in_seconds": {
+            "type": "integer",
+            "title": "Remainder Time In Seconds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "real_estate_agent_id",
+          "remainder_description",
+          "remainder_time_in_seconds"
+        ],
+        "title": "SchedulerReminderRequest"
       },
       "Task": {
         "properties": {
@@ -623,200 +928,6 @@
         ],
         "title": "TaskStatusRequest"
       },
-      "Property": {
-        "properties": {
-          "id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "id_reference": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "slug": {
-            "type": "string"
-          },
-          "url": {
-            "type": "string"
-          },
-          "total_price": {
-            "type": "number"
-          },
-          "iptu": {
-            "type": "number"
-          },
-          "condominium_fee": {
-            "type": "number"
-          },
-          "neighborhood": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "full_address": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "property_metadata": {
-            "items": {
-              "$ref": "#/components/schemas/PropertyMetadata"
-            },
-            "type": "array",
-            "default": []
-          },
-          "assistant_instructions": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "id_reference",
-          "title",
-          "description",
-          "slug",
-          "url",
-          "total_price",
-          "iptu",
-          "condominium_fee"
-        ]
-      },
-      "PropertyLookupRequest": {
-        "properties": {
-          "url": {
-            "type": "string"
-          },
-          "real_estate_agent_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "integer"
-              }
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "url",
-          "real_estate_agent_id"
-        ]
-      },
-      "PropertyMetadata": {
-        "properties": {
-          "id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "property_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "parameter_name": {
-            "type": "string"
-          },
-          "parameter_value_description": {
-            "type": "string"
-          }
-        },
-        "type": "object",
-        "required": [
-          "parameter_name",
-          "parameter_value_description"
-        ]
-      },
-      "RealEstateAgent": {
-        "properties": {
-          "id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "name": {
-            "type": "string"
-          },
-          "whatsapp": {
-            "type": "string"
-          }
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "whatsapp"
-        ]
-      },
-      "SchedulerReminderRequest": {
-        "properties": {
-          "real_estate_agent_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "integer"
-              }
-            ]
-          },
-          "remainder_description": {
-            "type": "object"
-          },
-          "remainder_time_in_seconds": {
-            "type": "integer"
-          }
-        },
-        "type": "object",
-        "required": [
-          "real_estate_agent_id",
-          "remainder_description",
-          "remainder_time_in_seconds"
-        ]
-      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -830,13 +941,16 @@
                 }
               ]
             },
-            "type": "array"
+            "type": "array",
+            "title": "Location"
           },
           "msg": {
-            "type": "string"
+            "type": "string",
+            "title": "Message"
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "title": "Error Type"
           }
         },
         "type": "object",
@@ -844,7 +958,8 @@
           "loc",
           "msg",
           "type"
-        ]
+        ],
+        "title": "ValidationError"
       }
     }
   }

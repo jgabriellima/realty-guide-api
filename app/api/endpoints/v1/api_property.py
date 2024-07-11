@@ -19,7 +19,7 @@ def property_lookup(request: PropertyLookupRequest):
 
 @property_router.post("/query_and_enrich_property_data", operation_id="query_and_enrich_property_data", response_model=Union[str, Property])
 def enrich_property_data(request: EnrichPropertyDataRequest):
-    property_service_response = PropertyService().enrich_property(request.property_slug,
+    property_service_response = PropertyService().enrich_property(request.property_id,
                                                                   real_estate_agent_id=request.real_estate_agent_id,
                                                                   request_details=request.request_details)
 

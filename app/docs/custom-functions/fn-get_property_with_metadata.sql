@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION real_estate.get_property_with_metadata(p_url TEXT, p_slug TEXT)
+CREATE OR REPLACE FUNCTION real_estate.get_property_with_metadata(p_url TEXT DEFAULT NULL, p_slug TEXT DEFAULT NULL, p_id INT DEFAULT NULL)
 RETURNS TABLE(
     id INT,
     id_reference TEXT,
@@ -31,7 +31,9 @@ SELECT
     jsonb_agg(jsonb_build_object('parameter_name', pm.parameter_name, 'parameter_value_description', pm.parameter_value_description)) AS property_metadata
 FROM real_estate.property p
          LEFT JOIN real_estate.property_metadata pm ON p.id = pm.property_id
-WHERE (p.url = p_url OR p.slug = p_slug)
+WHERE (p.url = p_url OR p_url IS NULL)
+  AND (p.slug = p_slug OR p_slug IS NULL)
+  AND (p.id = p_id OR p_id IS NULL)
 GROUP BY p.id;
 END;
 $$ LANGUAGE plpgsql;

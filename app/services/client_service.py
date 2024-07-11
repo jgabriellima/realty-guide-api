@@ -15,13 +15,13 @@ class ClientService(GenericTaskService):
         supabase = SupabaseDB().client
 
         client_data = supabase.schema('real_estate').rpc("get_client_with_metadata",
-                                                         params={"p_whatsapp": whatsapp_number}).execute()
+                                                         params={"p_whatsapp": whatsapp_number,
+                                                                 "p_client_id": None}).execute()
         logger.info(f"Data::get_client_with_metadata: {client_data}")
         client: Client = parse_to_schema(Client, client_data.data)
 
         if not client:
-            client: Client = parse_to_schema(Client, supabase.schema('real_estate').table("clients").insert(
-                {"whatsapp": whatsapp_number, "real_estate_agent_id": real_estate_agent_id}).execute().data)
+            client: Client = parse_to_schema(Client, supabase.schema('real_estate').table("client").insert({"whatsapp": whatsapp_number, "real_estate_agent_id": real_estate_agent_id}).execute().data)
             logger.info(f"Client created by whatsapp: `{whatsapp_number}`")
 
         return client
@@ -53,7 +53,7 @@ class ClientService(GenericTaskService):
             metadata_to_insert["real_estate_agent_id"] = real_estate_agent_id
         client_metadata = supabase.schema('real_estate').table("client_metadata").insert(metadata_to_insert).execute()
 
-        return f"Client memory saved successfully {client_metadata}"
+        return f"Client memory saved successfully. {parameter_name} => {parameter_value_description}"
 
 
 if __name__ == '__main__':

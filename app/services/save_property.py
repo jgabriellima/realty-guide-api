@@ -14,6 +14,7 @@ def save_property(property_data: Property):
     # Insert the property
     property_dict = property_data.model_dump(exclude={"property_metadata"})
     del property_dict["id"]
+    del property_dict["assistant_instructions"]
     response = supabase.schema("real_estate").table("property").insert(property_dict).execute()
 
     if response.data:

@@ -9,7 +9,7 @@ class PropertyLookupRequest(BaseModel):
 
 
 class EnrichPropertyDataRequest(BaseModel):
-    property_slug: str
+    property_id: int
     request_details: str
     real_estate_agent_id: Union[str, int]
 

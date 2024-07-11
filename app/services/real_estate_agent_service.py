@@ -30,8 +30,7 @@ class RealEstateAgentService(GenericTaskService):
         return agent
 
     def save_agent_memory(self, real_estate_agent_id: Union[int, str], parameter_name: str,
-                          parameter_value_description: str) -> Union[
-        str, RealEstateAgent]:
+                          parameter_value_description: str) -> str:
         supabase = SupabaseDB().client
 
         agent_data = supabase.schema('real_estate').rpc("get_agent_with_metadata",
@@ -44,13 +43,13 @@ class RealEstateAgentService(GenericTaskService):
             return SYSTEM_VIOLATION.format(id=real_estate_agent_id)
 
         # save the agent metadata
-        agent_metadata = supabase.schema('real_estate').table("agent_metadata").insert({
+        agent_metadata = supabase.schema('real_estate').table("real_estate_agent_metadata").insert({
             "agent_id": agent.id,
             "parameter_name": parameter_name,
             "parameter_value_description": parameter_value_description
         }).execute()
 
-        return f"Agent memory saved successfully. {agent_metadata}"
+        return f"Agent memory saved successfully. {parameter_name} => {parameter_value_description}"
 
 
 if __name__ == '__main__':

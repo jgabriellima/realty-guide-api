@@ -18,15 +18,18 @@ logger = setup_logging("BaseTaskWithUpdate")
 
 class BaseTaskWithUpdate(CeleryTask):
     def apply_async(self, *args, **kwargs):
-        # Update task status to running
-        supabase = SupabaseDB().client
-        task_id = kwargs['task_id']
-        supabase.schema("real_estate").table("tasks").update({
-            "status": "running",
-            "updated_at": "now()"
-        }).eq("task_id", task_id).execute()
-        logger.info(f"Task {task_id} status updated to running")
-        return super().apply_async(*args, **kwargs)
+        try:
+            # Update task status to running
+            supabase = SupabaseDB().client
+            task_id = kwargs['task_id']
+            supabase.schema("real_estate").table("tasks").update({
+                "status": "running",
+                "updated_at": "now()"
+            }).eq("task_id", task_id).execute()
+            logger.info(f"Task {task_id} status updated to running")
+            return super().apply_async(*args, **kwargs)
+        except Exception as e:
+            logger.info(f"Error updating task status:apply_async {e}")
 
     def on_success(self, retval, task_id, args, kwargs):
         supabase = SupabaseDB().client
@@ -41,7 +44,7 @@ class BaseTaskWithUpdate(CeleryTask):
         supabase.schema("real_estate").table("tasks").update({
             "status": "failed",
             "updated_at": "now()",
-            "error": str(exc)
+            "error": f"{str(exc)}. Aks if the user wants to retry"
         }).eq("task_id", task_id).execute()
         logger.error(f"Task {task_id} status updated to failed: {exc}")
 
@@ -76,14 +79,15 @@ def process_property_url(self, url: str):
 
 
 @celery.task(name="enrich_property_data", base=BaseTaskWithUpdate, bind=True)
-def enrich_property_data(self, property_slug, request_details):
+def enrich_property_data(self, property_id, request_details):
     """
     Enrich the property data with the request details
     """
     supabase = SupabaseDB().client
     res = supabase.schema('real_estate').rpc("get_property_with_metadata",
                                              params={"p_url": None,
-                                                     "p_slug": property_slug}).execute()
+                                                     "p_slug": None,
+                                                     "p_id": property_id}).execute()
 
     # enrich property
     property: Property = parse_to_schema(Property, res.data)

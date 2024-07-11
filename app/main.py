@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 
 from app.core.settings import settings
+from app.core.setup import start_sentry
 from app.setup_logging import setup_logging
 
 load_dotenv()
@@ -31,6 +32,7 @@ app = FastAPI(**settings.app_config, lifespan=lifespan)
 
 # Set up logging
 logger = setup_logging()
+start_sentry()
 
 
 @app.exception_handler(RequestValidationError)

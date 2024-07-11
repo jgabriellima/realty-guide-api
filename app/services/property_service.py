@@ -26,7 +26,7 @@ class PropertyService(GenericTaskService):
         supabase = SupabaseDB().client
 
         res = supabase.schema('real_estate').rpc("get_property_with_metadata",
-                                                 params={"p_url": url, "p_slug": None}).execute()
+                                                 params={"p_url": url, "p_slug": None, "p_id": None}).execute()
         logger.info(f"Data::get_property_with_metadata: {res}")
 
         property: Property = parse_to_schema(Property, res.data)
@@ -61,16 +61,16 @@ class PropertyService(GenericTaskService):
     def existing_extract_data_message(self, running_time: int, task_id: str) -> str:
         return self.PROPERTY_EXISTING_EXTRACT_DATA_TASK_MESSAGE.format(running_time=running_time, task_id=task_id)
 
-    def enrich_property(self, property_slug, real_estate_agent_id, request_details) -> Union[str, Property, Task]:
+    def enrich_property(self, property_id, real_estate_agent_id, request_details) -> Union[str, Property, Task]:
         supabase = SupabaseDB().client
 
-        logger.info(f"Enriching property with slug: {property_slug}")
+        logger.info(f"Enriching property with ID: {property_id}")
         res = supabase.schema('real_estate').rpc("get_property_with_metadata",
-                                                 params={"p_url": None, "p_slug": property_slug}).execute()
+                                                 params={"p_url": None, "p_slug": None, "p_id": property_id}).execute()
         # enrich property
         property: Property = parse_to_schema(Property, res.data)
         if not property:
-            raise Exception(f"Property not found with slug: {property_slug}")
+            raise Exception(f"Property not found with ID: {property_id}")
 
         logger.info(f"Property found: {property.model_dump_json()}")
 
@@ -94,7 +94,7 @@ class PropertyService(GenericTaskService):
                 task = task[0]
 
             task = self.handle_task(task, 'enrich_property_data',
-                                    {"property_slug": property_slug,
+                                    {"property_id": property_id,
                                      "request_details": request_details},
                                     real_estate_agent_id,
                                     f"Data Enrichment for Property {property.id} for agent {real_estate_agent_id}. Request: {request_details}")
@@ -122,13 +122,10 @@ if __name__ == '__main__':
     #     "gralhaalugueis-com-br-imovel-aluguel-apartamento-2-quartos-itacorubi-florianopolis-sc-125-51m2-rs6000-1569",
     #     "request_details"))
 
-    params = {
-        "p_real_estate_agent_id": 1,
-        "p_function_name": "process_property_url",
-        "p_statuses": ["pending"]
-    }
-    supabase_ = SupabaseDB().client
-    response = supabase_.schema('real_estate').rpc("get_tasks_by_agent_function_status", params=params).execute()
-    task: Task = parse_to_schema(Task, response.data)
+    url = "https://www.gralhaalugueis.com.br/imovel/aluguel+apartamento+3-quartos+canajure+florianopolis+sc+147,13m2+rs10000/1658"
+    supabase = SupabaseDB().client
+    res = supabase.schema('real_estate').rpc("get_property_with_metadata",
+                                             params={"p_url": url, "p_slug": None, "p_id": None}).execute()
 
-    print(task)
+    print(res)
+
