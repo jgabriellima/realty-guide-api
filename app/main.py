@@ -1,3 +1,6 @@
+from concurrent.futures import ProcessPoolExecutor
+from contextlib import asynccontextmanager
+
 from dotenv import load_dotenv
 
 from app.core.settings import settings
@@ -14,8 +17,17 @@ from app.api.endpoints.v1 import router
 from app.common.api_exceptions import RequestErrorHandler, RequestError
 from app.middleware.request_middleware import RequestContextLogMiddleware
 
+
 # Create FastAPI app
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.executor = ProcessPoolExecutor()
+    yield
+    app.state.executor.shutdown()
+
+
+# Create FastAPI app
+app = FastAPI(**settings.app_config, lifespan=lifespan)
 
 # Set up logging
 logger = setup_logging()

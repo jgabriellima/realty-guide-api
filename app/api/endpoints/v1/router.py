@@ -8,9 +8,8 @@ from app.api.endpoints.v1.api_task import api_task_router
 
 api_router = APIRouter()
 
-api_router.include_router(property_router, prefix="/properties", tags=["properties"])
-api_router.include_router(client_router, prefix="/clients", tags=["clients"])
-api_router.include_router(agent_router, prefix="/agents", tags=["agents"])
-api_router.include_router(agent_router, prefix="/agents", tags=["agents"])
-api_router.include_router(api_task_router, prefix="/tasks", tags=["tasks"])
-api_router.include_router(page_loader, prefix="/pages", tags=["loaders"])
+api_router.include_router(property_router, prefix="/properties", tags=["Property"])
+api_router.include_router(client_router, prefix="/clients", tags=["Client"])
+api_router.include_router(agent_router, prefix="/agents", tags=["Agent"])
+api_router.include_router(api_task_router, prefix="/tasks", tags=["Task"])
+api_router.include_router(page_loader, prefix="/pages", tags=["Loader"])

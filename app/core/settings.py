@@ -1,3 +1,5 @@
+from typing import Dict, Union
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -43,6 +45,19 @@ class Settings(BaseSettings):
     browserless_url: str = Field(..., validation_alias="BROWSERLESS_URL")
     browserless_key: str = Field(..., validation_alias="BROWSERLESS_KEY")
 
+    app_config: Dict[str, Union[str, Dict[str, str]]] = {
+        "title": "Realty Guide API",
+        "description": "The Realty Guide API is a tool for real estate agents to streamline "
+                       "the process of finding and enriching property data.",
+        "version": "0.0.1",
+        "contact": {
+            "email": "joaogabriellima.eng@gmail.com",
+        },
+        "license_info": {
+            "name": "Copyright @ 2024 JambuAI",
+            "url": "https://jambu.ai",
+        }
+    }
 
 settings = Settings()
 
