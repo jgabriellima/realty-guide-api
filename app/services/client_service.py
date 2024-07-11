@@ -11,7 +11,7 @@ logger = setup_logging("ClientService")
 
 class ClientService(GenericTaskService):
 
-    def lookup(self, whatsapp_number: str) -> Union[str, Client]:
+    def lookup(self, whatsapp_number: str, real_estate_agent_id: int = None) -> Union[str, Client]:
         supabase = SupabaseDB().client
 
         client_data = supabase.schema('real_estate').rpc("get_client_with_metadata",
@@ -20,8 +20,11 @@ class ClientService(GenericTaskService):
         client: Client = parse_to_schema(Client, client_data.data)
 
         if not client:
-            return (f"Client not found with whatsapp number: {whatsapp_number}. Before proceed and try again, "
-                    f"check if this is the right number. if yes, call `save_client_memory` endpoint to save this client.")
+            client: Client = parse_to_schema(Client, supabase.schema('real_estate').table("clients").insert(
+                {"whatsapp": whatsapp_number}).execute().data)
+            logger.info(f"Client created by whatsapp: `{whatsapp_number}`")
+            # return (f"Client not found with whatsapp number: {whatsapp_number}. Before proceed and try again, "
+            #         f"check if this is the right number. if yes, call `save_client_memory` endpoint to save this client.")
 
         return client
 
@@ -37,9 +40,8 @@ class ClientService(GenericTaskService):
         client: Client = parse_to_schema(Client, client_data.data)
 
         if not client:
-            client = supabase.schema('real_estate').table("clients").insert({
-                "whatsapp": whatsapp_number
-            }).execute()
+            client: Client = parse_to_schema(Client, supabase.schema('real_estate').table("clients").insert(
+                {"whatsapp": whatsapp_number}).execute().data)
             logger.info(f"Client created by whatsapp: `{whatsapp_number}`")
 
         metadata_to_insert = {

@@ -9,7 +9,7 @@ from app.utils.parsers import parse_to_schema
 api_task_router = APIRouter()
 
 
-@api_task_router.post("check_task_status", operation_id="check_task_status", response_model=Union[str, Task])
+@api_task_router.post("/check_task_status", operation_id="check_task_status", response_model=Union[str, Task])
 async def check_task_status(request: TaskStatusRequest) -> Union[str, Task]:
     supabase = SupabaseDB().client
 

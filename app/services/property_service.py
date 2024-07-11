@@ -30,10 +30,10 @@ class PropertyService(GenericTaskService):
         logger.info(f"Data::get_property_with_metadata: {res}")
 
         property: Property = parse_to_schema(Property, res.data)
-        property.assistant_instructions = (
-            "Observe the property details and provide a detailed analysis of the property and its surroundings."
-            " In necessary call your enrich_property tools to explore more information. "
-            "Always ask to the user if he wants more information about the property and suggest the best options to him.")
+        # property.assistant_instructions = (
+        #     "Observe the property details and provide a detailed analysis of the property and its surroundings."
+        #     " In necessary call your enrich_property tools to explore more information. "
+        #     "Always ask to the user if he wants more information about the property and suggest the best options to him.")
 
         if not property:
             task_data = supabase.schema('real_estate').rpc("get_task_by_url",

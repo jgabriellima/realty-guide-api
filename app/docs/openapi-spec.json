@@ -125,7 +125,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LookupRequest"
+                "$ref": "#/components/schemas/ClientLookupRequest"
               }
             }
           },
@@ -293,21 +293,6 @@
       }
     },
     "/v1/agents/schedule_remainder": {
-      "get": {
-        "description": "New endpoint",
-        "responses": {
-          "200": {
-            "description": "New response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "": ""
-                }
-              }
-            }
-          }
-        }
-      },
       "post": {
         "tags": [
           "Agent"
@@ -327,6 +312,55 @@
         "responses": {
           "200": {
             "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tasks/check_task_status": {
+      "post": {
+        "tags": [
+          "Task"
+        ],
+        "summary": "Check Task Status",
+        "operationId": "check_task_status",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskStatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Task"
+                    }
+                  ],
+                  "title": "Response Check Task Status"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -417,6 +451,28 @@
           "whatsapp_number"
         ]
       },
+      "ClientLookupRequest": {
+        "properties": {
+          "whatsapp_number": {
+            "type": "string"
+          },
+          "real_estate_agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "whatsapp_number",
+          "real_estate_agent_id"
+        ]
+      },
       "PreferencesRequest": {
         "properties": {
           "whatsapp_number": {
@@ -435,6 +491,126 @@
           "parameter_name",
           "parameter_value_description"
         ]
+      },
+      "Task": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          },
+          "function_name": {
+            "type": "string",
+            "title": "Function Name"
+          },
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "input_data": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Data"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "running_time": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Running Time"
+          }
+        },
+        "type": "object",
+        "required": [
+          "task_id",
+          "function_name",
+          "description",
+          "status"
+        ],
+        "title": "Task"
+      },
+      "TaskStatusRequest": {
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "task_id"
+        ],
+        "title": "TaskStatusRequest"
       },
       "Property": {
         "properties": {

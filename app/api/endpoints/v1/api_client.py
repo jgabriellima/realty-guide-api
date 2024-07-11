@@ -11,7 +11,7 @@ client_router = APIRouter()
 
 @client_router.post("/client_lookup", operation_id="client_lookup", response_model=Union[str, Client])
 def client_lookup(request: ClientLookupRequest):
-    client = ClientService().lookup(whatsapp_number=request.whatsapp_number)
+    client = ClientService().lookup(whatsapp_number=request.whatsapp_number, real_estate_agent_id=request.real_estate_agent_id)
     return client
 
 
