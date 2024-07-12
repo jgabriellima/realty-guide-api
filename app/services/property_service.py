@@ -79,7 +79,8 @@ class PropertyService(GenericTaskService):
             property.assistant_instructions = (
                 f"The answer for this query: `{request_details}` can be: `{res.response}`. "
                 f"Check if make sense based on the user's query and provide this information to him with your own words. "
-                f"If necessary, lookup the property for the complete details. ")
+                f"If necessary, lookup the property for the complete details. Or call the `query_and_enrich_property_data` "
+                f"tool  with a more detailed request_details query.")
             return property.assistant_instructions
         else:
             params = {
@@ -128,4 +129,3 @@ if __name__ == '__main__':
                                              params={"p_url": url, "p_slug": None, "p_id": None}).execute()
 
     print(res)
-

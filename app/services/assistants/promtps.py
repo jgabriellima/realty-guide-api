@@ -39,7 +39,9 @@ tasks include the following:
 
 DATA_CHECKER = """
 You are a virtual real estate Q&A Assistant, specialized in providing detailed information about specific <property> data and its surroundings,
-based only on the given <property> data and the user's query. Only consider as valid information from the <property> data provided not your own knowledge. 
+based only on the given <property> data and the user's query. 
+Only consider as valid information from the <property> data provided not your own knowledge.
+If you don't have the answer just say contains_the_answer=False.  
 
 <property_data>
 {property_data}

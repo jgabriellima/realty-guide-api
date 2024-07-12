@@ -17,20 +17,20 @@ def setup_logging(name=None, celery=False):
     logger.addHandler(handler)
 
     # Custom logging handler to send logs to PostHog
-    class PostHogHandler(logging.Handler):
-        def emit(self, record):
-            log_entry = self.format(record)
-            posthog.capture(distinct_id="logger", event="log_event", properties={"message": log_entry})
-
-    posthog_handler = PostHogHandler()
-    posthog_handler.setLevel(logging.INFO)
-    posthog_handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
-    logger.addHandler(posthog_handler)
+    # class PostHogHandler(logging.Handler):
+    #     def emit(self, record):
+    #         log_entry = self.format(record)
+    #         posthog.capture(distinct_id="logger", event="log_event", properties={"message": log_entry})
+    #
+    # posthog_handler = PostHogHandler()
+    # posthog_handler.setLevel(logging.INFO)
+    # posthog_handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+    # logger.addHandler(posthog_handler)
 
     if celery:
         from celery.utils.log import get_logger
         logger = get_logger(__name__)
-        logger.addHandler(posthog_handler)
+        # logger.addHandler(posthog_handler)
         logger.addHandler(handler)
 
     return logger

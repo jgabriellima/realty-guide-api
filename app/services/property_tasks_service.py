@@ -215,6 +215,8 @@ class PropertyLookup:
         if not property:
             return None
 
+        logger.info(f"Property found: {property.model_dump_json()}.  Calling enrich_assistant")
+
         result: Run = enrich_assistant(query, property.model_dump_json())
 
         assistant_only = [msg for msg in result.messages if msg.role == "assistant"]

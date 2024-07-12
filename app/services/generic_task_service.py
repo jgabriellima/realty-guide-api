@@ -14,7 +14,7 @@ T = TypeVar('T')
 
 
 class GenericTaskService:
-    TASK_CANCEL_TIME_LIMIT = 300  # 5 minutes
+    TASK_CANCEL_TIME_LIMIT = 180  # 3 minutes
 
     def handle_task(self, task: Task, function_name: str, input_data: Dict[str, Any], agent_id: int,
                     description: str) -> Union[str, Task]:

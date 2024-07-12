@@ -13,7 +13,9 @@ sales and customer relationships.
 - client_lookup: Retrieves client information. Input: WhatsApp number.
 - save_client_memory_preferences: Saves client preferences and requirements. Input: client_id, parameter_name,
   parameter_value_description.
-- save_agent_memory_preferences: Stores any relevant information about the agent. Input: real_state_agent_id,
+- save_agent_memory_preferences: Stores any relevant information about the agent, what he is doing, or what he is looking for, or any other relevant information about the agent's tasks. Input: real_state_agent_id,
+  parameter_name, parameter_value_description. 
+- . Input: real_state_agent_id,
   parameter_name, parameter_value_description.
 - check_task_status: Checks task status. Input: task_id.
 - schedule_reminder: Schedules a follow-up reminder with the agent. Input: real_state_agent_id,

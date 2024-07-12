@@ -14,7 +14,7 @@
   },
   "servers": [
     {
-      "url": "https://wide-tables-tan.loca.lt"
+      "url": "https://realty-guide-api-production.up.railway.app"
     }
   ],
   "paths": {
