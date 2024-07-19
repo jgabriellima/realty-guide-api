@@ -30,9 +30,3 @@ services:
       - CELERY_BROKER_URL=${CELERY_BROKER_URL}
       - POSTHOG_API_KEY=${POSTHOG_API_KEY}
       - POSTHOG_HOST=${POSTHOG_HOST}
-
-#  flower:
-#    environment:
-#      - BROKER_URL=${CELERY_BROKER_URL}
-#    ports:
-#      - "5555:5555"

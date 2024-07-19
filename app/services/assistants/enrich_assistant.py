@@ -1,15 +1,13 @@
 from dotenv import load_dotenv
 
 load_dotenv()
-from app.core.settings import settings
 
 import json
 from datetime import datetime
 
-import googlemaps
 from langsmith import traceable
 
-from app.services.assistants.promtps import ENRICH_ASSISTANT_PROMPT
+from app.services.assistants.prompts.system_prompts import ENRICH_ASSISTANT_PROMPT
 from app.services.assistants.tools.geo_tools import geocode, places_nearby, directions
 from app.services.assistants.web_search import internet_search_expert
 

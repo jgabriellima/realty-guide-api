@@ -4,16 +4,18 @@ from typing import Union, Optional, Dict, Any, List, TypeVar
 
 import requests
 from dotenv import load_dotenv
+from openai.types import CompletionUsage
 from pydantic import BaseModel
 
 from app.core.settings import settings
-from app.schemas.real_estate import Property
+from app.schemas.real_estate import Property, PropertyImages
 from app.services.assistants.enrich_assistant import enrich_assistant
-from app.utils.costs_calculator import calculate_price, CompletionUsage
+from app.services.property.prompts.property_prompts import ENRICH_PROPERTY, EXTRACT_DATA_FROM_IMAGE_DEFAULT_PROMPT
+from app.services.property.property_data import save_property
 from app.utils.custom_marvin.custom_marvin_extractor import custom_data_extractor
-from app.utils.html_injection import generate_script_to_mark_elements
-from app.utils.slug import url_to_slug
+from app.utils.html import generate_script_to_mark_elements
 from app.utils.timer import Timer
+from app.utils.utils import calculate_price, url_to_slug
 
 load_dotenv()
 import marvin
@@ -43,10 +45,7 @@ class PropertyLookup:
         self.http_client = http_client or requests.Session()
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
-    def capture_screenshot(self, target_url: str, custom_js_script: str = None,
-                           optimize_for_speed: bool = True) -> bytes:
-        URL = 'https://browserless-production-cbb6.up.railway.app/screenshot'
-        API_TOKEN = settings.browserless_key
+    def capture_screenshot(self, target_url: str, custom_js_script: str = None) -> bytes:
         headers = {'Cache-Control': 'no-cache', 'Content-Type': 'application/json'}
         data = {
             'url': target_url,
@@ -58,7 +57,8 @@ class PropertyLookup:
             data['addScriptTag'].append({"content": custom_js_script})
 
         try:
-            response = self.http_client.post(URL, headers=headers, json=data, params={'token': API_TOKEN})
+            response = self.http_client.post(f'{settings.browserless_url}/screenshot', headers=headers, json=data,
+                                             params={'token': settings.browserless_key})
             response.raise_for_status()
             logging.info('Screenshot taken successfully')
             return response.content
@@ -81,8 +81,7 @@ class PropertyLookup:
             raise ValueError("Invalid image input")
 
         try:
-            default_prompt = "You're an expert on data extraction from images. Extract the data following your instructions schema."
-            prompt = custom_prompt or default_prompt
+            prompt = custom_prompt or EXTRACT_DATA_FROM_IMAGE_DEFAULT_PROMPT
 
             results: ChatResponse = custom_data_extractor(
                 img,
@@ -168,25 +167,28 @@ class PropertyLookup:
                 if not extracted_data:
                     logging.error(f"Data extraction from full page screenshot failed for URL: {target_url}")
                     return None
-                obj["property_data"] = extracted_data
+                obj["property_data"] = extracted_data["target_data"][0]
 
             with Timer("Data Extraction - Images Table"):
                 extracted_data = self.extract_data_from_image(images_table_only_screenshot_data, target=ImageURL)
                 if not extracted_data:
                     logging.error(f"Data extraction from images table screenshot failed for URL: {target_url}")
                     return None
-                obj["property_images"] = extracted_data
+                print(f"Buceta 01: {extracted_data}")
+                obj["property_images"] = extracted_data["target_data"][0]
 
-            if "target_data" in obj["property_images"]:
-                obj["property_data"]["target_data"][0]["images"] = obj["property_images"]["target_data"][0]["urls"]
+            # if "target_data" in obj["property_images"]:
+                obj["property_data"]["property_images"] = [PropertyImages(url=url).model_dump() for url in
+                                                           obj["property_images"]["urls"]]
 
-            total_cost = obj["property_data"]["cost"]["price"] + obj["property_images"]["cost"]["price"]
-            obj["property_data"]["cost"]["total_price"] = total_cost
+                print(f'obj["property_data"]["property_images"]: {obj["property_data"]["property_images"]}')
+            # total_cost = obj["property_data"]["cost"]["price"] + obj["property_images"]["cost"]["price"]
+            # obj["property_data"]["cost"]["total_price"] = total_cost
 
             if self.debug:
                 self.save_extracted_data(obj, f'{full_page_screenshot_filename}.json')
 
-            property = Property(**obj.get("property_data").get("target_data")[0]) if obj.get("property_data") else None
+            property = Property(**obj.get("property_data")) if obj.get("property_data") else None
             property.url = target_url
             property.slug = url_to_slug(target_url)
 
@@ -236,7 +238,7 @@ class PropertyLookup:
         results: ChatResponse = custom_data_extractor(
             f" <property>{property.model_dump_json()}</property> | <data_to_extract>{data_to_extract}</data_to_extract>",
             target=Property,
-            instructions="You are an intelligent AI assistant specialized in Data enrichment. Enrich the property metadata with the data extracted from the assistant. Only return the new enriched property metadata, not the exisiting ones.",
+            instructions=ENRICH_PROPERTY,
             model_kwargs={
                 "model": "gpt-4o",
                 "temperature": 0.0,
@@ -250,3 +252,16 @@ class PropertyLookup:
         if target_data:
             enriched_property = target_data[0]
             return enriched_property
+
+
+if __name__ == '__main__':
+    url = "https://www.gralhaalugueis.com.br/imovel/aluguel+apartamento+2-quartos+rio-tavares+florianopolis+sc+80m2+rs8000/1601"
+    property: Property = PropertyLookup(debug=True).process_url(url)
+
+    property_json = property.model_dump_json()
+    with open(f"{url_to_slug(url)}.json", "w") as f:
+        f.write(property_json)
+
+
+    res = save_property(property)
+    print(res)

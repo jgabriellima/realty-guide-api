@@ -1,4 +1,4 @@
-marvin==2.3.5
+marvin==2.3.6
 fastapi
 requests==2.31.0
 sentry_sdk==2.7.1
@@ -19,3 +19,4 @@ playwright==1.41.0
 duckduckgo-search==6.1.9
 jupyter==1.0.0
 supabase==2.5.1
+langchain-chroma==0.1.2

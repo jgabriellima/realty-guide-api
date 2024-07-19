@@ -181,5 +181,5 @@ def generate_script_to_mark_elements(mark_image=False, mark_map=False, mark_all=
 
 if __name__ == '__main__':
     script = generate_script_to_mark_elements(mark_image=False, mark_map=True, remove_headers=True, remove_footers=True,
-                                              remove_ads=True, remove_forms=True, show_only_image_urls=True)
+                                              remove_ads=True, remove_forms=True, show_only_image_urls=False)
     print(script)

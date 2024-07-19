@@ -3,7 +3,7 @@ from typing import Union
 from app.core.db.supabase_conn import SupabaseDB
 from app.schemas.real_estate import Property, Task, TaskStatus
 from app.services.assistants.data_checker_assistant import DataCheckerOutput, data_checker
-from app.services.generic_task_service import GenericTaskService
+from app.services.task.generic_task_service import GenericTaskService
 from app.setup_logging import setup_logging
 from app.utils.parsers import parse_to_schema
 
@@ -30,11 +30,6 @@ class PropertyService(GenericTaskService):
         logger.info(f"Data::get_property_with_metadata: {res}")
 
         property: Property = parse_to_schema(Property, res.data)
-        # property.assistant_instructions = (
-        #     "Observe the property details and provide a detailed analysis of the property and its surroundings."
-        #     " In necessary call your enrich_property tools to explore more information. "
-        #     "Always ask to the user if he wants more information about the property and suggest the best options to him.")
-
         if not property:
             task_data = supabase.schema('real_estate').rpc("get_task_by_url",
                                                            params={"url": url,

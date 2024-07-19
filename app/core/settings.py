@@ -18,7 +18,6 @@ else:
 
 
 class Settings(BaseSettings):
-
     environment: str = Field("ENVIRONMENT", validation_alias="ENVIRONMENT")
     app_name: str = Field("Jambu.AI - Tools API", validation_alias="APP_NAME")
     default_large_model: str = Field("gpt-4o", validation_alias="DEFAULT_LARGE_MODEL")
@@ -60,6 +59,7 @@ class Settings(BaseSettings):
             "url": "https://jambu.ai",
         }
     }
+
 
 settings = Settings()
 

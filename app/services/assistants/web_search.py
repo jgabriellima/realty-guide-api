@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from app.services.assistants.tools.browser_tools import internet_search
+
 from langsmith import traceable
 from langchain_core.documents import Document
 from marvin.beta import Application
@@ -13,9 +15,6 @@ from app.setup_logging import setup_logging
 from langchain_community.vectorstores import DocArrayInMemorySearch
 from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import CharacterTextSplitter
-
-import requests
-from tenacity import retry, stop_after_attempt
 
 from pydantic import BaseModel
 import datetime
@@ -57,50 +56,11 @@ INSTRUCTIONS = f"""
 
 
 @traceable(run_type="tool")
-@retry(stop=stop_after_attempt(3))
-def internet_search(query: str) -> dict:
-    """
-    Fetch additional information from the web using the specified mechanism.
-
-    Parameters:
-    - query: str: The search query for fetching additional information.
-
-    Returns:
-    - dict: The response from the web request containing additional information.
-    """
-
-    logger.info(f"Fetching web info for query: `{query}`")
-
-    url = f"https://s.jina.ai/{query.replace(' ', '%20')}"
-
-    headers = {
-        # "X-With-Generated-Alt": "true",
-        # "X-With-Images-Summary": "true",
-        # "X-With-Links-Summary": "true",
-        "X-No-Cache": "true",
-        "Accept": "application/json"
-    }
-
-    response = requests.get(url, headers=headers)
-
-    if response.status_code == 200:
-        logger.info(f"Web info fetched successfully for query `{query}`")
-
-        return response.json()
-    else:
-        response.raise_for_status()
-
-
-@traceable(run_type="tool")
 def get_context(query: str) -> str:
     """
     Fetches the context from the web for the given query.
     """
     data = internet_search(query)
-
-    # save the json to a file
-    with open('../data.json', 'w') as f:
-        f.write(json.dumps(data))
 
     logger.info(f"Data fetched successfully for query `{query}`")
     text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
@@ -111,7 +71,6 @@ def get_context(query: str) -> str:
     response = db.as_retriever(search_kwargs={
         "k": 3
     }).invoke(query)
-    print(response)
     return json.dumps([{"content": doc.page_content} for doc in response])
 
 
@@ -135,13 +94,7 @@ def internet_search_expert(query):
 
 
 if __name__ == '__main__':
-    # query = "Palho\u00e7a - tráfico de drogas e indice de violência no bairro Caminho Novo"
-    # query = "bairro Caminho Novo - Palhoça, é um bairro seguro?"
-    # query = "bairro Novo Campeche em Florianópolis é perigoso? Tem muitos assaltaos na região?"
-    # query = "segurança e qualidade de vida na comunidade Caminho Novo, Palhoça, SC, Brasil"
     query = "quais as escolas com maior indice de aprovaçao no vestibular em florianopolis?"
     state, result = internet_search_expert(query)
-
     print(result)
-
     print(state)

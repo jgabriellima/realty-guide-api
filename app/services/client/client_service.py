@@ -2,7 +2,7 @@ from typing import Union
 
 from app.core.db.supabase_conn import SupabaseDB
 from app.schemas.real_estate import Client
-from app.services.generic_task_service import GenericTaskService
+from app.services.task.generic_task_service import GenericTaskService
 from app.setup_logging import setup_logging
 from app.utils.parsers import parse_to_schema
 

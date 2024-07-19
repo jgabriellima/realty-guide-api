@@ -1,11 +1,11 @@
 import time
 
 from app.schemas.real_estate import Property, RealEstateAgent
-from app.services.property_tasks_service import PropertyLookup
-from app.services.save_property import save_property, save_metadata
+from app.services.property.property_tasks_service import PropertyLookup
+from app.services.property.property_data import save_property, save_metadata
 from app.setup_logging import setup_logging
 from app.utils.parsers import parse_to_schema
-from app.worker import celery
+from app.tasks.worker import celery
 
 logger = setup_logging(celery=True)
 

@@ -2,6 +2,9 @@ from app.core.settings import settings
 
 
 def start_sentry():
+    """
+    Start Sentry
+    """
     import sentry_sdk
     sentry_sdk.init(
         dsn=settings.sentry_dsn,

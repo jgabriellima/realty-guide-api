@@ -1,9 +1,4 @@
-from typing import Union
-
 import requests
-
-from app.schemas.real_estate import Property
-from app.utils.parsers import parse_to_schema
 
 
 class RealtyGuideClient:

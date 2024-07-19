@@ -2,17 +2,12 @@ import json
 from datetime import datetime
 
 from app.core.db.supabase_conn import SupabaseDB
-from app.core.settings import settings
 
-import googlemaps
 from langsmith import traceable
 from marvin.types import ChatResponse
 from pydantic import BaseModel, Field
 
-from app.schemas.real_estate import Property
-from app.services.assistants.enrich_assistant import enrich_assistant
-from app.services.assistants.promtps import DATA_CHECKER
-from app.services.property_tasks_service import PropertyLookup
+from app.services.assistants.prompts.system_prompts import DATA_CHECKER
 from app.utils.custom_marvin.custom_marvin_extractor import custom_data_extractor
 
 

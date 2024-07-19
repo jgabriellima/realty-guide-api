@@ -14,6 +14,16 @@ class PropertyMetadata(BaseModel):
     parameter_value_description: str
 
 
+class PropertyImages(BaseModel):
+    """
+    Property Images schema
+    """
+    id: Optional[int] = None
+    property_id: Optional[int] = None
+    url: str
+    caption: Optional[str] = None
+
+
 class Property(BaseModel):
     """
     Property schema
@@ -30,18 +40,8 @@ class Property(BaseModel):
     neighborhood: Optional[str] = None
     full_address: Optional[str] = None
     property_metadata: List[PropertyMetadata] = []
+    property_images: List[PropertyImages] = []
     assistant_instructions: Optional[str] = None
-
-
-# Modelo PropertyImages
-class PropertyImages(BaseModel):
-    """
-    Property Images schema
-    """
-    id: Optional[int] = None
-    property_id: int
-    url: str
-    caption: Optional[str] = None
 
 
 class Client(BaseModel):
