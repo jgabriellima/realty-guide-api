@@ -13,27 +13,28 @@ logger = setup_logging("SavePropertyService")
 
 def save_property(property_data: Property):
     # Insert the property
-    property_dict = property_data.model_dump(exclude={"property_metadata", "property_images"})
-    del property_dict["id"]
-    del property_dict["assistant_instructions"]
+    if property_data:
+        property_dict = property_data.model_dump(exclude={"property_metadata", "property_images"})
+        del property_dict["id"]
+        del property_dict["assistant_instructions"]
 
-    response = supabase.schema("real_estate").table("property").insert(property_dict).execute()
+        response = supabase.schema("real_estate").table("property").insert(property_dict).execute()
 
-    if response.data:
-        # Get the inserted property id
-        property_id = response.data[0]["id"]
-        logger.info(f"Saving property {property_id}")
+        if response.data:
+            # Get the inserted property id
+            property_id = response.data[0]["id"]
+            logger.info(f"Saving property {property_id}")
 
-        # Insert the property metadata
-        logger.info(f"Saving metadata for property {property_id}")
-        save_metadata(property_id, property_data.property_metadata)
+            # Insert the property metadata
+            logger.info(f"Saving metadata for property {property_id}")
+            save_metadata(property_id, property_data.property_metadata)
 
-        logger.info(f"Saving Images metadata for property {property_id}")
-        save_images_metadata(property_id, property_data.property_images)
+            logger.info(f"Saving Images metadata for property {property_id}")
+            save_images_metadata(property_id, property_data.property_images)
 
-        return {"status": "success", "message": "Property and metadata saved successfully"}
-    else:
-        return {"status": "error", "message": response}
+            return {"status": "success", "message": "Property and metadata saved successfully"}
+        else:
+            return {"status": "error", "message": response}
 
 
 def save_metadata(property_id: int, property_metadata: List[PropertyMetadata]):

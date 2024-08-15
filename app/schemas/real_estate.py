@@ -20,7 +20,7 @@ class PropertyImages(BaseModel):
     """
     id: Optional[int] = None
     property_id: Optional[int] = None
-    url: str
+    url: str = None
     caption: Optional[str] = None
 
 
