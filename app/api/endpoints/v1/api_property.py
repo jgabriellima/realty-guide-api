@@ -20,6 +20,9 @@ def property_lookup(request: PropertyLookupRequest):
     """
     property_service_response = PropertyService().lookup(request.url, real_estate_agent_id=request.real_estate_agent_id)
 
+    if isinstance(property_service_response, str):
+        return property_service_response
+
     return remove_null_values(property_service_response.model_dump())
 
 
