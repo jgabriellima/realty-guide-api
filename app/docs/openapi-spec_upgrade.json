@@ -1,0 +1,1148 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Realty Guide API",
+    "description": "The Realty Guide API is a tool for real estate agents to streamline the process of finding and enriching property data.",
+    "contact": {
+      "email": "joaogabriellima.eng@gmail.com"
+    },
+    "license": {
+      "name": "Copyright @ 2024 JambuAI",
+      "url": "https://jambu.ai/"
+    },
+    "version": "0.0.1"
+  },
+  "servers": [
+    {
+      "url": "https://realty-guide-api-production.up.railway.app"
+    }
+  ],
+  "paths": {
+    "/v1/properties/lookup": {
+      "post": {
+        "tags": [
+          "Property"
+        ],
+        "summary": "Property Lookup",
+        "description": "Lookup property data by URL\n\n:param request: PropertyLookupRequest\n:return: Union[str, Property]",
+        "operationId": "property_lookup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PropertyLookupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Property"
+                    }
+                  ],
+                  "title": "Response Property Lookup"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/properties/query_and_enrich_property_data": {
+      "post": {
+        "tags": [
+          "Property"
+        ],
+        "summary": "Enrich Property Data",
+        "description": "Enrich property data by URL\n\n:param request: EnrichPropertyDataRequest\n:return: Union[str, Property]",
+        "operationId": "query_and_enrich_property_data",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrichPropertyDataRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Property"
+                    }
+                  ],
+                  "title": "Response Query And Enrich Property Data"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/clients/client_lookup": {
+      "post": {
+        "tags": [
+          "Client"
+        ],
+        "summary": "Client Lookup",
+        "description": "Lookup client\n:param request: ClientLookupRequest\n:return: Union[str, Client]",
+        "operationId": "client_lookup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientLookupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Client"
+                    }
+                  ],
+                  "title": "Response Client Lookup"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/clients/save_client_memory_preferences": {
+      "post": {
+        "tags": [
+          "Client"
+        ],
+        "summary": "Save Client Memory Preferences",
+        "description": "Save client memory preferences\n:param request: ClientPreferencesRequest\n:return: str",
+        "operationId": "save_client_memory_preferences",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientPreferencesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "title": "Response Save Client Memory Preferences"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/agents/save_agent_memory_preferences": {
+      "post": {
+        "tags": [
+          "Agent"
+        ],
+        "summary": "Save Agent Memory Preferences",
+        "description": "Save agent memory preferences\n:param request: AgentPreferencesRequest\n:return: str",
+        "operationId": "save_agent_memory_preferences",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentPreferencesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "title": "Response Save Agent Memory Preferences"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/agents/agent_lookup": {
+      "post": {
+        "tags": [
+          "Agent"
+        ],
+        "summary": "Agent Lookup",
+        "description": "Lookup agent\n:param request: AgentLookupRequest\n:return: Union[str, RealEstateAgent]",
+        "operationId": "agent_lookup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentLookupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/components/schemas/RealEstateAgent"
+                    }
+                  ],
+                  "title": "Response Agent Lookup"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/agents/schedule_remainder": {
+      "post": {
+        "tags": [
+          "Agent"
+        ],
+        "summary": "Schedule Remainder",
+        "description": "Schedule a remainder\n:param request: SchedulerReminderRequest\n:return: dict",
+        "operationId": "schedule_remainder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchedulerReminderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tasks/check_task_status": {
+      "post": {
+        "tags": [
+          "Task"
+        ],
+        "summary": "Check Task Status",
+        "description": "Check the status of a task\n\n:param request: TaskStatusRequest\n:return: Union[str, Task]",
+        "operationId": "check_task_status",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskStatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Task"
+                    }
+                  ],
+                  "title": "Response Check Task Status"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/whatsapp/send_audio": {
+      "post": {
+        "tags": [
+          "Whatsapp"
+        ],
+        "summary": "Send Audio",
+        "description": "Check the status of a task\n\n:param request: TaskStatusRequest\n:return: Union[str, Task]",
+        "operationId": "send_audio",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendAudioRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "title": "Response Send Audio"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/whatsapp/send_image": {
+      "post": {
+        "tags": [
+          "Whatsapp"
+        ],
+        "summary": "Send Image",
+        "description": "Check the status of a task\n\n:param request: TaskStatusRequest\n:return: Union[str, Task]",
+        "operationId": "send_image",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendImageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "title": "Response Send Image"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AgentLookupRequest": {
+        "properties": {
+          "agent_whatsapp_number": {
+            "type": "string",
+            "title": "Agent Whatsapp Number"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_whatsapp_number"
+        ],
+        "title": "AgentLookupRequest"
+      },
+      "AgentPreferencesRequest": {
+        "properties": {
+          "parameter_name": {
+            "type": "string",
+            "title": "Parameter Name"
+          },
+          "parameter_value_description": {
+            "type": "string",
+            "title": "Parameter Value Description"
+          },
+          "real_estate_agent_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Real Estate Agent Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "parameter_name",
+          "parameter_value_description"
+        ],
+        "title": "AgentPreferencesRequest"
+      },
+      "Client": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "whatsapp": {
+            "type": "string",
+            "title": "Whatsapp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "whatsapp"
+        ],
+        "title": "Client",
+        "description": "Client schema"
+      },
+      "ClientLookupRequest": {
+        "properties": {
+          "client_whatsapp_number": {
+            "type": "string",
+            "title": "Client Whatsapp Number"
+          },
+          "real_estate_agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "title": "Real Estate Agent Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_whatsapp_number",
+          "real_estate_agent_id"
+        ],
+        "title": "ClientLookupRequest"
+      },
+      "ClientPreferencesRequest": {
+        "properties": {
+          "client_id": {
+            "type": "integer",
+            "title": "Client Id"
+          },
+          "parameter_name": {
+            "type": "string",
+            "title": "Parameter Name"
+          },
+          "parameter_value_description": {
+            "type": "string",
+            "title": "Parameter Value Description"
+          },
+          "real_estate_agent_id": {
+            "type": "integer",
+            "title": "Real Estate Agent Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_id",
+          "parameter_name",
+          "parameter_value_description",
+          "real_estate_agent_id"
+        ],
+        "title": "ClientPreferencesRequest"
+      },
+      "EnrichPropertyDataRequest": {
+        "properties": {
+          "property_id": {
+            "type": "integer",
+            "title": "Property Id"
+          },
+          "request_details": {
+            "type": "string",
+            "title": "Request Details"
+          },
+          "real_estate_agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "title": "Real Estate Agent Id"
+          },
+          "conversation_id": {
+            "type": "string",
+            "title": "Conversation Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "property_id",
+          "request_details",
+          "real_estate_agent_id",
+          "conversation_id"
+        ],
+        "title": "EnrichPropertyDataRequest"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Property": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "id_reference": {
+            "type": "string",
+            "title": "Id Reference"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "total_price": {
+            "type": "number",
+            "title": "Total Price"
+          },
+          "iptu": {
+            "type": "number",
+            "title": "Iptu"
+          },
+          "condominium_fee": {
+            "type": "number",
+            "title": "Condominium Fee"
+          },
+          "neighborhood": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Neighborhood"
+          },
+          "full_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Address"
+          },
+          "property_metadata": {
+            "items": {
+              "$ref": "#/components/schemas/PropertyMetadata"
+            },
+            "type": "array",
+            "title": "Property Metadata",
+            "default": [
+
+            ]
+          },
+          "property_images": {
+            "items": {
+              "$ref": "#/components/schemas/PropertyImages"
+            },
+            "type": "array",
+            "title": "Property Images",
+            "default": [
+
+            ]
+          },
+          "assistant_instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assistant Instructions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id_reference",
+          "title",
+          "description",
+          "slug",
+          "url",
+          "total_price",
+          "iptu",
+          "condominium_fee"
+        ],
+        "title": "Property",
+        "description": "Property schema"
+      },
+      "PropertyImages": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "property_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Property Id"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "caption": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caption"
+          }
+        },
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "title": "PropertyImages",
+        "description": "Property Images schema"
+      },
+      "PropertyLookupRequest": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "real_estate_agent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "title": "Real Estate Agent Id"
+          },
+          "conversation_id": {
+            "type": "string",
+            "title": "Conversation Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "url",
+          "real_estate_agent_id",
+          "conversation_id"
+        ],
+        "title": "PropertyLookupRequest"
+      },
+      "PropertyMetadata": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "property_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Property Id"
+          },
+          "parameter_name": {
+            "type": "string",
+            "title": "Parameter Name"
+          },
+          "parameter_value_description": {
+            "type": "string",
+            "title": "Parameter Value Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "parameter_name",
+          "parameter_value_description"
+        ],
+        "title": "PropertyMetadata",
+        "description": "PropertyMetadata schema"
+      },
+      "RealEstateAgent": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "whatsapp": {
+            "type": "string",
+            "title": "Whatsapp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "whatsapp"
+        ],
+        "title": "RealEstateAgent",
+        "description": "RealEstateAgent schema"
+      },
+      "SchedulerReminderRequest": {
+        "properties": {
+          "real_estate_agent_id": {
+            "type": "integer",
+            "title": "Real Estate Agent Id"
+          },
+          "remainder_description": {
+            "type": "string",
+            "title": "Remainder Description"
+          },
+          "remainder_time_in_seconds": {
+            "type": "integer",
+            "title": "Remainder Time In Seconds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "real_estate_agent_id",
+          "remainder_description",
+          "remainder_time_in_seconds"
+        ],
+        "title": "SchedulerReminderRequest"
+      },
+      "SendAudioRequest": {
+        "properties": {
+          "conversation_id": {
+            "type": "string",
+            "title": "Conversation Id"
+          },
+          "text_to_audio_message": {
+            "type": "string",
+            "title": "Text To Audio Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "conversation_id",
+          "text_to_audio_message"
+        ],
+        "title": "SendAudioRequest"
+      },
+      "SendImageRequest": {
+        "properties": {
+          "conversation_id": {
+            "type": "string",
+            "title": "Conversation Id"
+          },
+          "image_url": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Image Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "conversation_id",
+          "image_url"
+        ],
+        "title": "SendImageRequest"
+      },
+      "Task": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          },
+          "function_name": {
+            "type": "string",
+            "title": "Function Name"
+          },
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "input_data": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Data"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "running_time": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Running Time"
+          }
+        },
+        "type": "object",
+        "required": [
+          "task_id",
+          "function_name",
+          "description",
+          "status"
+        ],
+        "title": "Task"
+      },
+      "TaskStatusRequest": {
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "task_id"
+        ],
+        "title": "TaskStatusRequest"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

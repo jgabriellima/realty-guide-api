@@ -1,10 +1,10 @@
 from typing import Union
 
 from app.core.db.supabase_conn import SupabaseDB
+from app.core.setup_logging import setup_logging
 from app.schemas.real_estate import Property, Task, TaskStatus
 from app.services.assistants.data_checker_assistant import DataCheckerOutput, data_checker
 from app.services.task.generic_task_service import GenericTaskService
-from app.core.setup_logging import setup_logging
 from app.utils.parsers import parse_to_schema
 
 logger = setup_logging("PropertyTaskService")
@@ -22,7 +22,8 @@ class PropertyService(GenericTaskService):
         "wait a few seconds while we process this URL. "
         "I'll let you know when it's done. TaskID: {task_id}")
 
-    def lookup(self, url: str, real_estate_agent_id: Union[str, int] = None) -> Union[str, Property]:
+    def lookup(self, url: str, real_estate_agent_id: Union[str, int] = None, conversation_id=None) -> Union[
+        str, Property]:
         supabase = SupabaseDB().client
 
         res = supabase.schema('real_estate').rpc("get_property_with_metadata",
@@ -37,7 +38,9 @@ class PropertyService(GenericTaskService):
             logger.info(f"Data::get_task_by_url: {task_data}")
             task: Task = parse_to_schema(Task, task_data.data)
 
-            task = self.handle_task(task, 'process_property_url', {"url": url}, real_estate_agent_id,
+            task = self.handle_task(task, 'process_property_url', {"url": url,
+                                                                   "conversation_id": conversation_id},
+                                    real_estate_agent_id,
                                     f"Processing property URL {url} for agent {real_estate_agent_id}")
 
             if task.status == TaskStatus.PENDING:
@@ -56,7 +59,7 @@ class PropertyService(GenericTaskService):
     def existing_extract_data_message(self, running_time: int, task_id: str) -> str:
         return self.PROPERTY_EXISTING_EXTRACT_DATA_TASK_MESSAGE.format(running_time=running_time, task_id=task_id)
 
-    def enrich_property(self, property_id, real_estate_agent_id, request_details) -> Union[str, Property, Task]:
+    def enrich_property(self, property_id, real_estate_agent_id, request_details, conversation_id=None) -> Union[str, Property, Task]:
         supabase = SupabaseDB().client
 
         logger.info(f"Enriching property with ID: {property_id}")
@@ -91,7 +94,9 @@ class PropertyService(GenericTaskService):
 
             task = self.handle_task(task, 'enrich_property_data',
                                     {"property_id": property_id,
-                                     "request_details": request_details},
+
+                                     "request_details": request_details,
+                                     "conversation_id": conversation_id},
                                     real_estate_agent_id,
                                     f"Data Enrichment for Property {property.id} for agent {real_estate_agent_id}. Request: {request_details}")
 

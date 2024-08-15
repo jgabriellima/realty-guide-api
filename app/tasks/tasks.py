@@ -1,11 +1,14 @@
 import time
 
-from app.schemas.real_estate import Property, RealEstateAgent
-from app.services.property.property_tasks_service import PropertyLookup
-from app.services.property.property_data import save_property, save_metadata
+import requests
+
+from app.core.settings import settings
 from app.core.setup_logging import setup_logging
-from app.utils.parsers import parse_to_schema
+from app.schemas.real_estate import Property, RealEstateAgent
+from app.services.property.property_data import save_property, save_metadata
+from app.services.property.property_tasks_service import PropertyLookup
 from app.tasks.worker import celery
+from app.utils.parsers import parse_to_schema
 
 logger = setup_logging(celery=True)
 
@@ -14,6 +17,20 @@ from app.core.db.supabase_conn import SupabaseDB
 from app.core.setup_logging import setup_logging
 
 logger = setup_logging("BaseTaskWithUpdate")
+
+
+def call_jambu_integrator_task_done(conversation_id, task_id):
+    """
+    Call the JambuAI service to notify that the task is done
+    """
+    logger.info(f"Calling JambuAI service for task {task_id} completed. Conversation ID: {conversation_id}")
+    res = requests.post(
+        f"{settings.jambu_integrator_url}/v1/whatsapp/task_done",
+        json={"conversation_id": conversation_id,
+              "task_id": task_id},
+    )
+
+    return res.text
 
 
 class BaseTaskWithUpdate(CeleryTask):
@@ -61,7 +78,7 @@ def create_task(task_type):
 
 
 @celery.task(name="process_property_url", bind=True)
-def process_property_url(self, url: str):
+def process_property_url(self, url: str, conversation_id: str):
     """
     Process the property URL and save the property data
     """
@@ -73,11 +90,16 @@ def process_property_url(self, url: str):
 
     logger.info(f"Task {task_id} completed")
 
+    try:
+        call_jambu_integrator_task_done(conversation_id, task_id)
+    except:
+        logger.error(f"Error calling JambuAI service for task {task_id} completed. Conversation ID: {conversation_id}")
+
     return True
 
 
-@celery.task(name="enrich_property_data", base=BaseTaskWithUpdate, bind=True)
-def enrich_property_data(self, property_id, request_details):
+@celery.task(name="enrich_property_data", bind=True)
+def enrich_property_data(self, property_id, request_details, conversation_id):
     """
     Enrich the property data with the request details
     """
@@ -97,7 +119,13 @@ def enrich_property_data(self, property_id, request_details):
 
     logger.info(f"Enriched property: {result}")
     save_metadata(property.id, result.property_metadata)
-    # save the property
+
+    try:
+        call_jambu_integrator_task_done(conversation_id, "enrich_property_data")
+    except:
+        logger.error(f"Error calling JambuAI service for task enrich_property_data completed. Conversation ID: {conversation_id}")
+
+
     return True
 
 

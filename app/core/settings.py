@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     browserless_url: str = Field(..., validation_alias="BROWSERLESS_URL")
     browserless_key: str = Field(..., validation_alias="BROWSERLESS_KEY")
 
+    # JAMBU_INTEGRATOR_URL
+    jambu_integrator_url: str = Field(..., validation_alias="JAMBU_INTEGRATOR_URL")
+
     app_config: Dict[str, Union[str, Dict[str, str]]] = {
         "title": "Realty Guide API",
         "description": "The Realty Guide API is a tool for real estate agents to streamline "

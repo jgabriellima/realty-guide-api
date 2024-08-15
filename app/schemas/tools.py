@@ -6,12 +6,14 @@ from pydantic import BaseModel
 class PropertyLookupRequest(BaseModel):
     url: str
     real_estate_agent_id: Union[str, int]
+    conversation_id: str
 
 
 class EnrichPropertyDataRequest(BaseModel):
     property_id: int
     request_details: str
     real_estate_agent_id: Union[str, int]
+    conversation_id: str
 
 
 class EnrichPropertyDataResponse(BaseModel):

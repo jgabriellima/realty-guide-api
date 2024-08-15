@@ -18,7 +18,9 @@ def property_lookup(request: PropertyLookupRequest):
     :param request: PropertyLookupRequest
     :return: Union[str, Property]
     """
-    property_service_response = PropertyService().lookup(request.url, real_estate_agent_id=request.real_estate_agent_id)
+    property_service_response = PropertyService().lookup(request.url,
+                                                         real_estate_agent_id=request.real_estate_agent_id,
+                                                         conversation_id=request.conversation_id)
 
     if isinstance(property_service_response, str):
         return property_service_response
@@ -26,7 +28,8 @@ def property_lookup(request: PropertyLookupRequest):
     return remove_null_values(property_service_response.model_dump())
 
 
-@property_router.post("/query_and_enrich_property_data", operation_id="query_and_enrich_property_data", response_model=Union[str, Property])
+@property_router.post("/query_and_enrich_property_data", operation_id="query_and_enrich_property_data",
+                      response_model=Union[str, Property])
 def enrich_property_data(request: EnrichPropertyDataRequest):
     """
     Enrich property data by URL
@@ -36,6 +39,7 @@ def enrich_property_data(request: EnrichPropertyDataRequest):
     """
     property_service_response = PropertyService().enrich_property(request.property_id,
                                                                   real_estate_agent_id=request.real_estate_agent_id,
-                                                                  request_details=request.request_details)
+                                                                  request_details=request.request_details,
+                                                                  conversation_id=request.conversation_id)
 
     return property_service_response
