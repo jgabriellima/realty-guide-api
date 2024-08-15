@@ -1,3 +1,4 @@
+import concurrent.futures
 import json
 import logging
 from typing import Union, Optional, Dict, Any, List, TypeVar
@@ -123,8 +124,25 @@ class PropertyLookup:
             target_url (str): The URL of the property to process.
 
         Returns:
-            Optional[Dict[str, Any]]: The consolidated data extracted from the property page and images.
+            Optional[Property]: The consolidated data extracted from the property page and images.
         """
+        def capture_screenshot_task(url, script, filename):
+            screenshot_data = self.capture_screenshot(url, custom_js_script=script)
+            if not screenshot_data:
+                logging.error(f"Screenshot capture failed for URL: {url}")
+                return None
+            if self.debug:
+                with open(filename, 'wb') as f:
+                    f.write(screenshot_data)
+            return screenshot_data
+
+        def extract_data_task(screenshot_data, target):
+            extracted_data = self.extract_data_from_image(screenshot_data, target=target)
+            if not extracted_data:
+                logging.error(f"Data extraction failed for target: {target}")
+                return None
+            return extracted_data["target_data"][0]
+
         full_page_screenshot_filename = f'{url_to_slug(target_url)}.png'
         image_table_only_screenshot_filename = f'{url_to_slug(target_url)}_images_list.png'
 
@@ -134,65 +152,46 @@ class PropertyLookup:
                     mark_image=False, mark_map=True, remove_headers=True, remove_footers=True,
                     remove_ads=True, remove_forms=True
                 )
-
-                full_page_screenshot_data = self.capture_screenshot(target_url,
-                                                                    custom_js_script=script_to_cleanup_the_page_elements)
-                if not full_page_screenshot_data:
-                    logging.error(f"Full page screenshot failed for URL: {target_url}")
-                    return None
-
-                if self.debug:
-                    with open(full_page_screenshot_filename, 'wb') as f:
-                        f.write(full_page_screenshot_data)
-
-            with Timer("Images table Only Screenshot capture"):
                 script_to_remove_all_elements_and_keep_only_the_images_table = generate_script_to_mark_elements(
                     show_only_image_urls=True
                 )
 
-                images_table_only_screenshot_data = self.capture_screenshot(target_url,
-                                                                            custom_js_script=script_to_remove_all_elements_and_keep_only_the_images_table)
-                if not images_table_only_screenshot_data:
-                    logging.error(f"Images table screenshot failed for URL: {target_url}")
-                    return None
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    future_full_page = executor.submit(capture_screenshot_task, target_url, script_to_cleanup_the_page_elements, full_page_screenshot_filename)
+                    future_images_table = executor.submit(capture_screenshot_task, target_url, script_to_remove_all_elements_and_keep_only_the_images_table, image_table_only_screenshot_filename)
 
-                if self.debug:
-                    with open(image_table_only_screenshot_filename, 'wb') as f:
-                        f.write(images_table_only_screenshot_data)
+                    full_page_screenshot_data = future_full_page.result()
+                    images_table_only_screenshot_data = future_images_table.result()
+
+                    if not full_page_screenshot_data or not images_table_only_screenshot_data:
+                        return None
 
             obj = {"property_data": {}, "property_images": {}}
 
-            with Timer("Data Extraction - Full Page"):
-                extracted_data = self.extract_data_from_image(full_page_screenshot_data, target=Property)
-                if not extracted_data:
-                    logging.error(f"Data extraction from full page screenshot failed for URL: {target_url}")
-                    return None
-                obj["property_data"] = extracted_data["target_data"][0]
+            with Timer("Data Extraction"):
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    future_data_extraction_full_page = executor.submit(extract_data_task, full_page_screenshot_data, Property)
+                    future_data_extraction_images_table = executor.submit(extract_data_task, images_table_only_screenshot_data, ImageURL)
 
-            with Timer("Data Extraction - Images Table"):
-                extracted_data = self.extract_data_from_image(images_table_only_screenshot_data, target=ImageURL)
-                if not extracted_data:
-                    logging.error(f"Data extraction from images table screenshot failed for URL: {target_url}")
-                    return None
-                print(f"Buceta 01: {extracted_data}")
-                obj["property_images"] = extracted_data["target_data"][0]
+                    extracted_data_full_page = future_data_extraction_full_page.result()
+                    extracted_data_images_table = future_data_extraction_images_table.result()
 
-            # if "target_data" in obj["property_images"]:
-                obj["property_data"]["property_images"] = [PropertyImages(url=url).model_dump() for url in
-                                                           obj["property_images"]["urls"]]
+                    if not extracted_data_full_page or not extracted_data_images_table:
+                        return None
 
-                print(f'obj["property_data"]["property_images"]: {obj["property_data"]["property_images"]}')
-            # total_cost = obj["property_data"]["cost"]["price"] + obj["property_images"]["cost"]["price"]
-            # obj["property_data"]["cost"]["total_price"] = total_cost
+                    obj["property_data"] = extracted_data_full_page
+                    obj["property_images"] = extracted_data_images_table
 
-            if self.debug:
-                self.save_extracted_data(obj, f'{full_page_screenshot_filename}.json')
+                    obj["property_data"]["property_images"] = [PropertyImages(url=url).model_dump() for url in obj["property_images"]["urls"]]
 
-            property = Property(**obj.get("property_data")) if obj.get("property_data") else None
-            property.url = target_url
-            property.slug = url_to_slug(target_url)
+                if self.debug:
+                    self.save_extracted_data(obj, f'{full_page_screenshot_filename}.json')
 
-            return property
+                property = Property(**obj.get("property_data")) if obj.get("property_data") else None
+                property.url = target_url
+                property.slug = url_to_slug(target_url)
+
+                return property
 
         except requests.exceptions.RequestException as e:
             logging.error(f"Network error while processing URL {target_url}: {e}")
@@ -255,7 +254,8 @@ class PropertyLookup:
 
 
 if __name__ == '__main__':
-    url = "https://www.gralhaalugueis.com.br/imovel/aluguel+apartamento+2-quartos+rio-tavares+florianopolis+sc+80m2+rs8000/1601"
+    # url = "https://www.gralhaalugueis.com.br/imovel/aluguel+apartamento+2-quartos+centro+florianopolis+sc+120m2+rs4500/1592"
+    url = "https://qualitefloripaimoveis.com.br/imovel/casas/florianopolis/cacupe-casa-4-quartos-casa-a-venda-em-condominio-fechado-no-cacupe-cod-148621"
     property: Property = PropertyLookup(debug=True).process_url(url)
 
     property_json = property.model_dump_json()

@@ -4,7 +4,7 @@ from app.core.db.supabase_conn import SupabaseDB
 from app.schemas.real_estate import Property, Task, TaskStatus
 from app.services.assistants.data_checker_assistant import DataCheckerOutput, data_checker
 from app.services.task.generic_task_service import GenericTaskService
-from app.setup_logging import setup_logging
+from app.core.setup_logging import setup_logging
 from app.utils.parsers import parse_to_schema
 
 logger = setup_logging("PropertyTaskService")
@@ -114,13 +114,14 @@ class PropertyService(GenericTaskService):
 
 
 if __name__ == '__main__':
-    # print(PropertyService().enrich_property(
-    #     "gralhaalugueis-com-br-imovel-aluguel-apartamento-2-quartos-itacorubi-florianopolis-sc-125-51m2-rs6000-1569",
-    #     "request_details"))
-
-    url = "https://www.gralhaalugueis.com.br/imovel/aluguel+apartamento+3-quartos+canajure+florianopolis+sc+147,13m2+rs10000/1658"
-    supabase = SupabaseDB().client
-    res = supabase.schema('real_estate').rpc("get_property_with_metadata",
-                                             params={"p_url": url, "p_slug": None, "p_id": None}).execute()
-
-    print(res)
+    print(PropertyService().enrich_property(
+        "gralhaalugueis-com-br-imovel-aluguel-apartamento-2-quartos-itacorubi-florianopolis-sc-125-51m2-rs6000-1569",
+        "request_details"))
+    #
+    # url = "https://www.gralhaalugueis.com.br/imovel/aluguel+apartamento+3-quartos+canajure+florianopolis+sc+147,13m2+rs10000/1658"
+    # url = "https://www.gralhaalugueis.com.br/imovel/aluguel+apartamento+3-quartos+canajure+florianopolis+sc+147,13m2+rs10000/1658"
+    # supabase = SupabaseDB().client
+    # res = supabase.schema('real_estate').rpc("get_property_with_metadata",
+    #                                          params={"p_url": url, "p_slug": None, "p_id": None}).execute()
+    #
+    # print(res)

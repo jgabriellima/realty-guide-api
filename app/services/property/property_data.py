@@ -4,7 +4,7 @@ from supabase import Client
 
 from app.core.db.supabase_conn import SupabaseDB
 from app.schemas.real_estate import Property, PropertyMetadata, PropertyImages
-from app.setup_logging import setup_logging
+from app.core.setup_logging import setup_logging
 
 # Supabase connection
 supabase: Client = SupabaseDB().client

@@ -3,7 +3,7 @@ import time
 from app.schemas.real_estate import Property, RealEstateAgent
 from app.services.property.property_tasks_service import PropertyLookup
 from app.services.property.property_data import save_property, save_metadata
-from app.setup_logging import setup_logging
+from app.core.setup_logging import setup_logging
 from app.utils.parsers import parse_to_schema
 from app.tasks.worker import celery
 
@@ -11,7 +11,7 @@ logger = setup_logging(celery=True)
 
 from celery import Task as CeleryTask
 from app.core.db.supabase_conn import SupabaseDB
-from app.setup_logging import setup_logging
+from app.core.setup_logging import setup_logging
 
 logger = setup_logging("BaseTaskWithUpdate")
 
@@ -67,8 +67,6 @@ def process_property_url(self, url: str):
     """
     task_id = self.request.id
     logger.info(f"Started task {task_id} for URL: {url}")
-    time.sleep(5)
-
     property: Property = PropertyLookup().process_url(url)
     logger.info(f"Property data: {property}")
     save_property(property)

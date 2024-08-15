@@ -13,7 +13,7 @@ from app.services.assistants.web_search import internet_search_expert
 
 from marvin.beta.assistants import Assistant
 
-from app.setup_logging import setup_logging
+from app.core.setup_logging import setup_logging
 
 logger = setup_logging("EnrichAssistant")
 

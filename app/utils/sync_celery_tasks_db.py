@@ -5,7 +5,7 @@ import os
 from celery.local import PromiseProxy
 
 from app.core.db.supabase_conn import SupabaseDB
-from app.setup_logging import setup_logging
+from app.core.setup_logging import setup_logging
 
 logger = setup_logging("Sync Celery Tasks to DB")
 

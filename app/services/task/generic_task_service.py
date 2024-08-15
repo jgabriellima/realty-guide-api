@@ -5,7 +5,7 @@ from dateutil.parser import parse as parse_date
 
 from app.core.db.supabase_conn import SupabaseDB
 from app.schemas.real_estate import Task, TaskStatus
-from app.setup_logging import setup_logging
+from app.core.setup_logging import setup_logging
 from app.tasks.worker import celery
 
 logger = setup_logging("GenericTaskService")

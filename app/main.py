@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 from app.core.settings import settings
 from app.core.setup import start_sentry
-from app.setup_logging import setup_logging
+from app.core.setup_logging import setup_logging
 
 load_dotenv()
 

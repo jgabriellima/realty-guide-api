@@ -10,7 +10,7 @@ from langsmith import traceable
 from langchain_core.documents import Document
 from marvin.beta import Application
 
-from app.setup_logging import setup_logging
+from app.core.setup_logging import setup_logging
 
 from langchain_community.vectorstores import DocArrayInMemorySearch
 from langchain_openai import OpenAIEmbeddings

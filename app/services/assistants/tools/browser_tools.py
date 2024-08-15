@@ -2,7 +2,7 @@ from celery.worker.state import requests
 from langsmith import traceable
 from tenacity import retry, stop_after_attempt
 
-from app.setup_logging import setup_logging
+from app.core.setup_logging import setup_logging
 
 logger = setup_logging(__name__)
 

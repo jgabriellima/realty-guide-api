@@ -1,6 +1,6 @@
 from typing import Type, TypeVar, List, Union
 
-from app.setup_logging import setup_logging
+from app.core.setup_logging import setup_logging
 
 T = TypeVar('T')
 
