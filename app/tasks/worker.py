@@ -13,7 +13,7 @@ celery.worker_cancel_long_running_tasks_on_connection_loss = True
 celery.conf.broker_connection_retry_on_startup = True
 celery.conf.worker_prefetch_multiplier = 1
 celery.conf.task_acks_late = True
-celery.autodiscover_tasks(['app'])
+celery.autodiscover_tasks(['app.tasks'])
 
 celery.conf.update(
     task_serializer='json',

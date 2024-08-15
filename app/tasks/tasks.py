@@ -60,7 +60,7 @@ def create_task(task_type):
     return True
 
 
-@celery.task(name="process_property_url", base=BaseTaskWithUpdate, bind=True)
+@celery.task(name="process_property_url", bind=True)
 def process_property_url(self, url: str):
     """
     Process the property URL and save the property data
